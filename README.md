@@ -1,6 +1,6 @@
 
 
-# Engine 
+# Qoraal Engine 
 <img align="right" width="230px" src="./doc/logo.png" alt="engine" /> 
 
 
@@ -9,7 +9,7 @@ __Engine__ is designed to execute sophisticated, hierarchical state machines wit
 
 __Tool__, the integrated compiler, transforms these Engine Machine Language files into byte code, ready for execution by Engine. Fast, efficient, and lightweight, Tool is perfect for just-in-time compilation, minimizing overhead and seamlessly integrating with your application.
 
-__Engine__ with __Tool__ is tailor-made for embedded C or C++ applications, providing a powerful and efficient solution for real-time state machine management, ensuring optimal performance with a nostalgic twist.
+__Engine__ with __Tool__ is tailor-made for embedded C or C++ applications, providing a powerful and efficient solution for real-time state machine management, ensuring optimal performance.
 
 ## The Proverbial "Toaster Oven"
 You might be surprised to hear that Engine was designed for use with deeply embedded systems. To better understand how this works, let's consider a simple example, the proverbial "Toaster Oven":
