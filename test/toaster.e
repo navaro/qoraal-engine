@@ -2,8 +2,8 @@ decl_name       "Toaster Oven"
 decl_version    2
 
 decl_variables {
-    Timer = [timer.default] /* Reload value for timer. The value will
-                               be read from the config file. */
+    Timer = 20 /* Reload value for timer. The value will
+                               be read from the config file for [timer.default]. */
 }
 
 /* Actions can dispatch evets into their own state machines. We

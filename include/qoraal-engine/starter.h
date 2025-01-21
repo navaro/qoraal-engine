@@ -27,7 +27,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "parts/parts_events.h"
 
 /*===========================================================================*/
 /* Pre-compile time settings.                                                */

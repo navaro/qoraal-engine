@@ -21,20 +21,16 @@
     SOFTWARE.
  */
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 #if CFG_USE_ENGINE_CONSOLE
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "parts.h"
-#include "../engine.h"
-
-#if defined CFG_PORT_CORAL && CFG_PORT_CORAL
-#include <coral-services/services.h>
-#endif
-
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
+#include <qoraal/qoraal.h>
 #if CFG_USE_STRSUB
-#include "../common/strsub.h"
+#include "qoraal/common/strsub.h"
 #endif
 
 
@@ -94,11 +90,7 @@ part_console_cmd (PENGINE_T instance, uint32_t start)
 static void
 console_out(const char * str)
 {
-#ifdef CFG_PORT_POSIX
-    printf ("%s", str) ;
-#else
-    nshell_dbg_out (str) ;
-#endif
+    qoraal_debug_print (str) ;
 }
 
 /**

@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include "qoraal/qoraal.h"
 
 /*===========================================================================*/
 /* Client pre-compile time settings.                                         */
@@ -39,7 +40,7 @@
 
 #define DBG_ENGINE_LOG(type, fmt_str, ...)              engine_log(0, type, fmt_str, ##__VA_ARGS__ )
 #define DBG_ENGINE_CHECK(cond, ret, fmt_str, ...)       {if (!(cond)) {  engine_log(0, ENGINE_LOG_TYPE_VERBOSE, fmt_str, ##__VA_ARGS__ ) ; return ret ; }}
-#define DBG_ENGINE_ASSERT(cond, msg)                    {if (!(cond)) {  engine_port_assert(msg) ; }}
+#define DBG_ENGINE_ASSERT(cond, msg)                    {if (!(cond)) {  qoraal_debug_assert(msg) ; }}
 
 /*===========================================================================*/
 /* Error Codes                                                                 */
@@ -455,7 +456,7 @@ typedef struct STATEMACHINE_S {
 #define SET_STATEMACHINE_STATE(statemachine, state_idx, state)  \
     do { statemachine->states_offset[state_idx] =  (STATEMACHINE_STATE_T *) ((uintptr_t)state   -  (uintptr_t)statemachine) ; } while(0)
 
-#include "port/port.h"
+//#include "port/port.h"
 
 /*===========================================================================*/
 /* External declarations.                                                    */

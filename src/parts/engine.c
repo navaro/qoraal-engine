@@ -21,14 +21,15 @@
     SOFTWARE.
  */
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 #if CFG_USE_ENGINE_ENGINE
 
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include "parts.h"
-#include "../engine.h"
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
+#include "../port/port.h"
 
 /*===========================================================================*/
 /* part local functions.                                                     */

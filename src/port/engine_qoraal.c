@@ -22,19 +22,22 @@
  */
 
 
-#include "engine_config.h"
-#if CFG_PORT_CORAL
+#include "qoraal-engine/config.h"
+
 #include <stdio.h>
 #include <string.h>
-#include <coral-platform/os.h>
-#include <coral-platform/common/lists.h>
-#include <coral-services/services.h>
-#include "../engine.h"
-#include "../machine/parse.h"
+#include <qoraal/qoraal.h>
+#include <qoraal/svc/svc_shell.h>
+#include <qoraal/common/lists.h>
+#include "qoraal-engine/engine.h"
+#include "port.h"
+#include "../tool/parse.h"
 
-#define SERVICE_ENGINE_TASK_QUEUE           SERVICE_PRIO_QUEUE2
+#define SERVICE_ENGINE_TASK_QUEUE       SERVICE_PRIO_QUEUE2
 #define ENGINE_TASK_HEAP_STORE          (1<<0)
-#define ENGINE_TASK_STORE_CNT               20
+#define ENGINE_TASK_STORE_CNT           20
+#define ENGINE_MAX_VARIABLES            100
+
 
 /**
  * A structure for a task with a pointer to a state machine.
@@ -51,6 +54,10 @@ static int32_t              _engine_task_store_cnt = -1 ;
 static int32_t              _engine_task_store_alloc = 0 ;
 static OS_MUTEX_DECL(       _engine_task_mutex);
 static ENGINE_EVENT_T       _engine_task_store_heap[ENGINE_TASK_STORE_CNT] ;
+static int32_t              _engine_variables[ENGINE_MAX_VARIABLES] = {0} ;
+
+static uint32_t             _engine_alloc[2] = {0} ;
+static uint32_t             _engine_alloc_max[2] = {0} ;
 
 #if CFG_UTILS_STRSUB
 static int32_t              engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uint32_t arg) ;
@@ -64,7 +71,7 @@ static OS_MUTEX_DECL(       _engine_mutex);
 static inline ENGINE_EVENT_T*
 engine_task_alloc (void) {
 #if !ENGINE_TASK_STORE_CNT
-    return (ENGINE_EVENT_T*)heap_malloc (HEAP_SPACE, sizeof(ENGINE_EVENT_T)) ;
+    return (ENGINE_EVENT_T*)qoraal_malloc (sizeof(ENGINE_EVENT_T)) ;
 #else
     os_mutex_lock (&_engine_task_mutex) ;
     _engine_task_store_alloc++ ;
@@ -82,7 +89,7 @@ engine_task_alloc (void) {
 
     } else {
         os_mutex_unlock (&_engine_task_mutex) ;
-        task = (ENGINE_EVENT_T*)heap_malloc (HEAP_SPACE, sizeof(ENGINE_EVENT_T)) ;
+        task = (ENGINE_EVENT_T*)qoraal_malloc (sizeof(ENGINE_EVENT_T)) ;
         svc_tasks_init_task (&task->task) ;
 
     }
@@ -94,7 +101,7 @@ engine_task_alloc (void) {
 static inline void
 engine_task_free(ENGINE_EVENT_T* task) {
 #if !ENGINE_TASK_STORE_CNT
-    heap_free(HEAP_SPACE_ENGINE, task) ;
+    qoraal_free(task) ;
 #else
     os_mutex_lock (&_engine_task_mutex) ;
     _engine_task_store_alloc-- ;
@@ -107,7 +114,7 @@ engine_task_free(ENGINE_EVENT_T* task) {
         os_mutex_unlock (&_engine_task_mutex) ;
     } else {
         os_mutex_unlock (&_engine_task_mutex) ;
-        heap_free(HEAP_SPACE, task) ;
+        qoraal_free(task) ;
     }
 #endif
 }
@@ -150,7 +157,7 @@ engine_task_wait(void) {
 }
 
 int32_t
-engine_port_init (void)
+engine_port_init (void * arg)
 {
     engine_task_init () ;
     os_mutex_init (&_engine_task_mutex) ;
@@ -179,13 +186,40 @@ engine_port_stop (void)
 void*
 engine_port_malloc (portheap heap, uint32_t size)
 {
-    return heap_malloc (HEAP_SPACE, size) ;
+    uint32_t * mem = qoraal_malloc(size + sizeof(uint32_t)) ;
+    if (mem) {
+        _engine_alloc[heap] += size ;
+        if (_engine_alloc_max[heap] < _engine_alloc[heap]) {
+            _engine_alloc_max[heap] = _engine_alloc[heap] ;
+        }
+        *mem = size ;
+        return mem + 1 ;
+
+    }
+
+    return 0 ;
 }
 
 void
 engine_port_free (portheap heap, void* mem)
 {
-    heap_free (HEAP_SPACE, mem) ;
+    if (mem) {
+        uint32_t * pmem = (uint32_t*)mem - 1 ;
+        _engine_alloc[heap] -= *pmem ;
+        qoraal_free (pmem) ;
+    }
+}
+
+void
+engine_log_mem_usage (void)
+{
+    DBG_ENGINE_LOG (ENGINE_LOG_TYPE_ERROR,
+            "port: alloc %u machine bytes (%u max)",
+            _engine_alloc[heapMachine], _engine_alloc_max[heapMachine]) ;
+    DBG_ENGINE_LOG (ENGINE_LOG_TYPE_ERROR,
+            "port: alloc %u parser bytes (%u max)",
+            _engine_alloc[heapParser], _engine_alloc_max[heapParser]) ;
+
 }
 
 void
@@ -220,12 +254,11 @@ engine_port_event_create (EVENT_TASK_CB complete)
     ENGINE_EVENT_T * task = engine_task_alloc () ;
 
     if (!task) {
-        svc_logger_log ("ENG   : : event allocation failed!!") ;
+        svc_logger_printf ("ENG   : : event allocation failed!!") ;
         return 0 ;
 
     }
     task->complete = complete ;
-
 
     return (PENGINE_EVENT_T)task ;
 }
@@ -276,7 +309,7 @@ engine_port_log (int inst, const char *format_str, va_list  args)
 void
 engine_port_assert (const char *msg)
 {
-    dbg_assert(msg)  ;
+    qoraal_debug_assert(msg)  ;
 }
 
 
@@ -284,19 +317,31 @@ engine_port_assert (const char *msg)
 int32_t
 engine_port_variable_write (uint32_t idx, int32_t val)
 {
-    return backupreg_write32(idx + BACKUPREG_IDX_STATEMACHINE_START, (uint32_t)val) ;
+    if (idx >= ENGINE_MAX_VARIABLES) {
+        return ENGINE_PARM ;
+
+    }
+
+    _engine_variables[idx] = val ;
+    return ENGINE_OK ;
 }
 
 int32_t
 engine_port_variable_read (uint32_t idx, int32_t * val)
 {
-    return backupreg_read32(idx + BACKUPREG_IDX_STATEMACHINE_START, (uint32_t*)val) ;
+    if (idx >= ENGINE_MAX_VARIABLES) {
+        return ENGINE_PARM ;
+
+    }
+
+    *val = _engine_variables[idx] ;
+    return ENGINE_OK ;
 }
 
 static int32_t
 _corshell_out(void* ctx, uint32_t out, const char* str)
 {
-    if (out >= CORSHELL_OUT_ERR) {
+    if (str && (out && out < SVC_SHELL_IN_STD)) {
         DBG_MESSAGE_T (DBG_MESSAGE_SEVERITY_ERROR, 0,
                 "ENG  : :  %s", str ? str : "") ;
 
@@ -311,21 +356,19 @@ engine_port_shellcmd (const char* shellcmd)
 {
     int32_t res = ENGINE_FAIL ;
     char    cmd[128]     ;
-    char *argv[CORSHELL_ARGC_MAX];
-    int argc ;
 
-    if (shellcmd) {
+
+    if (shellcmd && strlen(shellcmd)) {
+
+        SVC_SHELL_IF_T  qshell_if ;
+        svc_shell_if_init (&qshell_if, 0, _corshell_out, 0) ;
 
         int len = strlen (shellcmd) ;
         if (len > 127) len = 127 ;
         strncpy (cmd, shellcmd, len) ;
         cmd[len] = '\0' ;
-        argc = corshell_cmd_split(cmd, len, /*SIPSHELL_CMD_PREFIX*/0, argv, CORSHELL_ARGC_MAX-1);
+        svc_shell_script_run (&qshell_if, "", cmd, len) ;
 
-        if (argc > 0) {
-            res = corshell_cmd_run (0, 0, _corshell_out, &argv[0],  argc-0) ;
-
-        }
 
     }
 
@@ -407,7 +450,7 @@ engine_port_sanitize_string (const char * string, uint32_t * plen)
     STRSUB_HANDLER_T    strsub ;
     strsub_install_handler(&strsub_instance, StrsubToken1, &strsub, parse_strsub_cb) ;
     uint32_t dstlen = strsub_parse_get_dst_length (&strsub_instance, string, *plen) ;
-    char * newname = heap_malloc(HEAP_SPACE, dstlen) ;
+    char * newname = qoraal_malloc( dstlen) ;
     if (newname) {
         *plen = strsub_parse_string_to (&strsub_instance, string, *plen, newname, dstlen) ;
     }
@@ -422,8 +465,8 @@ void
 engine_port_release_string (const char * string)
 {
 #if CFG_UTILS_STRSUB
-    heap_free (HEAP_SPACE, (void*)string) ;
+    qoraal_free ((void*)string) ;
 #endif
 }
 
-#endif /* CFG_PORT_CORAL */
+

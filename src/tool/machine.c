@@ -21,16 +21,16 @@
     SOFTWARE.
  */
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 #include <string.h>
 
 #include "machine.h"
 #include "collection.h"
 #include "parse.h"
 
-#include "../parts/parts.h"
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
 #include "../port/port.h"
-#include "../engine.h"
 
 
 #define STATEMACHINE_FLAGS_APP_HEAP             (1<<0)

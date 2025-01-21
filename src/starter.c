@@ -21,19 +21,19 @@
     SOFTWARE.
  */
 
-#include "port/engine_config.h"
-
+#include "qoraal-engine/config.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include "starter.h"
-#include "engine.h"
-#include "parts/parts.h"
+#include "qoraal-engine/starter.h"
+#include "qoraal-engine/engine.h"
+#include "qoraal-engine/parts/parts.h"
 #include "tool/machine.h"
 #include "tool/parse.h"
+#include "port/port.h"
 
 
 static STARTER_OUT_FP                       _starter_log = 0 ;
@@ -100,6 +100,7 @@ parser_log (char* message, ...)
     va_list args;
     va_start(args, message);
     _vlog (message, args) ;
+    va_end (args) ;
 }
 
 static void
@@ -108,6 +109,7 @@ parser_report (char* message, ...)
     va_list args;
     va_start(args, message);
     _vlog (message, args) ;
+    va_end (args) ;
 }
 
 static void
@@ -116,6 +118,7 @@ parser_error (char* message, ...)
     va_list args;
     va_start(args, message);
     _vlog(message, args) ;
+    va_end (args) ;
 }
 
 

@@ -23,14 +23,14 @@
 
 
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "../engine.h"
-#include "parts.h"
-
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
+#include "../port/port.h"
 
 #define PART_STING_BUFFER_SIZE          256
 

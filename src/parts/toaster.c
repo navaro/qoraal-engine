@@ -21,11 +21,11 @@
     SOFTWARE.
  */
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 #if  CFG_USE_ENGINE_TOASTER
 #include <stdio.h>
-#include "parts.h"
-#include "../engine.h"
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
 
 
 /*===========================================================================*/

@@ -5,15 +5,20 @@
 #include <stdbool.h>
 #include <string.h>
 #include <getopt.h>
-#include "../src/starter.h"
+#include "qoraal/qoraal.h"
+#include "qoraal/svc/svc_logger.h"
+#include "qoraal-engine/starter.h"
+#include "qoraal-engine/parts/parts_events.h"
 
-#define ENGINE_VERSION_STR      "Navaro Engine Demo v '" __DATE__ "'"
+#define ENGINE_VERSION_STR      "Navaro Qoraal Engine Demo v '" __DATE__ "'"
 
 #define OPTION_ID_HELP              4
 #define OPTION_ID_VERBOSE           6
 #define OPTION_ID_LIST              7
 #define OPTION_ID_CONFIG_FILE       8
 #define OPTION_COMMENT_MAX          256
+
+
 
 struct option opt_parm[] = {
     { "help",no_argument,0,OPTION_ID_HELP },
@@ -23,7 +28,7 @@ struct option opt_parm[] = {
     { 0,0,0,0 },
 };
 
-char *              opt_file = 0;
+char *              opt_file = "./test/toaster.e";
 bool                opt_verbose = false ;
 bool                opt_list = false ;
 char *              opt_config_file = 0;
@@ -51,6 +56,7 @@ usage(char* comm)
 static int32_t  out(void* ctx, uint32_t out, const char* str) ;
 static void     list(void* ctx, starter_list_t type, const char * name, const char* description) ;
 static char *   get_config_file(void) ;
+static void     qoraal_start (void) ;
 
 
 int
@@ -61,6 +67,8 @@ main(int argc, char* argv[])
     int32_t res ;
     printf (ENGINE_VERSION_STR) ;
     printf ("\r\n\r\n") ;
+
+    qoraal_start () ;
 
     /*
      * Parse the command line parameters.
@@ -166,8 +174,8 @@ main(int argc, char* argv[])
          ENGINE_EVENT_CONSOLE_CHAR(c) ;
      } while (c != 'q') ;
 
-
-     starter_stop () ;
+    starter_stop () ;
+    svc_logger_wait_all (500) ;
 
      return 0;
 }
@@ -227,4 +235,36 @@ out(void* ctx, uint32_t out, const char* str)
 
     return 0 ;
 }
+
+void
+qoraal_print (const char *format)
+{
+    printf ("%s", format) ;
+}
+
+void
+qoraal_assert (const char *format)
+{
+    printf (format) ;
+    abort () ;
+}
+
+void
+logger_cb (void* channel, LOGGERT_TYPE_T type, uint8_t facility, const char* msg)
+{
+    printf("--- %s\n", msg) ;
+}
+
+void
+qoraal_start (void)
+{
+    static const QORAAL_CFG_T       qoraal_cfg = { .malloc = malloc, .free = free, .debug_print = qoraal_print, .debug_assert = qoraal_assert, .current_time = 0, .wdt_kick = 0};
+    static LOGGER_CHANNEL_T         log_channel = { .fp = logger_cb, .user = (void*)0, .filter = { { .mask = SVC_LOGGER_MASK, .type = SVC_LOGGER_SEVERITY_LOG | SVC_LOGGER_FLAGS_PROGRESS }, {0,0} } };
+    qoraal_instance_init (&qoraal_cfg) ;
+    qoraal_svc_init (0) ;
+    os_sys_start () ;
+    qoraal_svc_start () ;
+    svc_logger_channel_add (&log_channel) ;
+}
+
 

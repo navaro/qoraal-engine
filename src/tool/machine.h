@@ -30,7 +30,7 @@
 #include <stdbool.h>
 #include "collection.h"
 #include "parse.h"
-#include "../engine.h"
+#include "qoraal-engine/engine.h"
 
 /*===========================================================================*/
 /* Macros and defines.                                                                */

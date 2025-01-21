@@ -21,13 +21,13 @@
     SOFTWARE.
  */
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 #if CFG_USE_ENGINE_DEBUG
 #include <stdio.h>
 #include <ctype.h>
 #include <limits.h>
-#include "parts.h"
-#include "../engine.h"
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
 
 #if CFG_UTILS_STRSUB
 #include <coral-utils/common/strsub.h>

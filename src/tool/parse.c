@@ -21,7 +21,7 @@
     SOFTWARE.
  */
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 
 
 #include <stdarg.h>
@@ -34,7 +34,7 @@
 #include "collection.h"
 #include "lex.h"
 #include "machine.h"
-#include "../engine.h"
+#include "qoraal-engine/engine.h"
 
 
 static void     __LexError(struct LexState * Lexer, enum LexError Error, char* Message )  ;
@@ -814,7 +814,9 @@ int ParserVariablesDeclare (struct LexState * Lexer, enum LexToken Token, struct
                     get_param_value32 (Lexer, &intval, &Parm)) {
                 engine_port_variable_write (idx - ENGINE_REGISTER_COUNT, intval) ;
 
-            } else if (PARSER_ID_TYPE(Parm.Id) == parseRegId) {
+            } 
+#if CFG_USE_REGISTRY            
+            else if (PARSER_ID_TYPE(Parm.Id) == parseRegId) {
                 if (registry_int32_get (Parm.Val.Identifier, &intval) != ENGINE_OK) {
                     PARSER_REPORT(statemachine->logif,
                             "warning: registry entry '%s' not a valid integer value !\r\n",
@@ -823,6 +825,7 @@ int ParserVariablesDeclare (struct LexState * Lexer, enum LexToken Token, struct
 
                 }
             }
+#endif
             else {
                 PARSER_REPORT(statemachine->logif, "warning: expected value!\r\n") ;
                 return 0 ;

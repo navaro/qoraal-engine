@@ -3,7 +3,7 @@
 #ifndef __PARTS_EVENTS_H__
 #define __PARTS_EVENTS_H__
 
-#include "../port/engine_config.h"
+#include "qoraal-engine/config.h"
 
 #include <stdint.h>
 #include "parts.h"

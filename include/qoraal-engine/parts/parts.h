@@ -25,12 +25,10 @@
 #ifndef __PARTS_H__
 #define __PARTS_H__
 
-#include "../port/engine_config.h"
 
 #include <stdint.h>
+#include <stddef.h>
 #include <limits.h>
-
-
 
 
 extern char __engine_action_base__ ;
@@ -57,14 +55,9 @@ typedef int32_t (*PART_ACTION_FP)(PENGINE_T /*instance*/, uint32_t /*parm*/, uin
 #define PART_CMD_PARM_STOP                  0
 #define PART_CMD_PARM_START                 1
 
-#ifdef CFG_PORT_POSIX
-#define ALIGN           __attribute__ ((aligned (32)))
-#else
 #define ALIGN
-#endif
 
-
-typedef struct ALIGN PART_ACTION_S {
+typedef struct __attribute__((packed)) PART_ACTION_S {
     PART_ACTION_FP          fp ;
     const char *            name ;
     const char *            desc ;
@@ -72,14 +65,14 @@ typedef struct ALIGN PART_ACTION_S {
 } PART_ACTION_T ;
 
 
-typedef struct ALIGN PARTS_EVENT_S {
+typedef struct __attribute__((packed)) PARTS_EVENT_S {
     const char *            name ;
     const char *            desc ;
 
 } PART_EVENT_T ;
 
 
-typedef struct ALIGN PART_CONST_S {
+typedef struct __attribute__((packed)) PART_CONST_S {
     int16_t                 id ;
     uint16_t                reserved ;
     const char *            name ;
@@ -88,7 +81,7 @@ typedef struct ALIGN PART_CONST_S {
 } PART_CONST_T ;
 
 
-typedef struct ALIGN PART_CMD_S {
+typedef struct __attribute__((packed)) PART_CMD_S {
     PART_CMD_FP         fp ;
     const char *        name ;
 } PART_CMD_T ;
@@ -98,8 +91,7 @@ typedef struct ALIGN PART_CMD_S {
 #define ENGINE_ACTION_IMPL(name, desc)      \
     const PART_ACTION_T                     \
     __engine_action_##name ALIGN            \
-    __attribute__((used))                   \
-     __attribute__((section(".engine.engine_action." #name ))) =        \
+        __attribute__((used, section(".engine.engine_action." #name ), aligned(1))) =        \
     { action_##name,                        \
     #name,                                  \
     desc                                    \
@@ -108,8 +100,7 @@ typedef struct ALIGN PART_CMD_S {
 #define ENGINE_EVENT_IMPL(name, desc)       \
     const PART_EVENT_T                      \
     __engine_event_##name ALIGN             \
-    __attribute__((used))                   \
-     __attribute__((section(".engine.engine_event." #name))) =      \
+     __attribute__((used, section(".engine.engine_event." #name), aligned(1))) =      \
     {                                       \
     #name,                                  \
     desc                                    \
@@ -118,8 +109,7 @@ typedef struct ALIGN PART_CMD_S {
 #define ENGINE_CONST_IMPL(value, name, desc)        \
     const PART_CONST_T                      \
     __engine_const_##name ALIGN             \
-    __attribute__((used))                   \
-     __attribute__((section(".engine.engine_const." #name))) =      \
+     __attribute__((used, section(".engine.engine_const." #name), aligned(1))) =      \
     { value,                                \
     0,                                      \
     #name,                                  \
@@ -129,8 +119,7 @@ typedef struct ALIGN PART_CMD_S {
 #define ENGINE_CMD_FP_IMPL(fp)              \
     const PART_CMD_T                        \
     __engine_cmd_##fp ALIGN                 \
-    __attribute__((used))                   \
-     __attribute__((section(".engine.engine_cmd." #fp))) =      \
+    __attribute__((used, section(".engine.engine_cmd." #fp), aligned(1))) =      \
     { fp, #fp                               \
     }
 

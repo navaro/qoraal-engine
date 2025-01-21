@@ -25,7 +25,7 @@
 #define __PARSE_H__
 
 #include <stdint.h>
-#include "../engine.h"
+#include "qoraal-engine/engine.h"
 
 
 #define PARSE_PUSH_OP           '+'

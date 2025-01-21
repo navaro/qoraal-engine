@@ -25,10 +25,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "port/engine_config.h"
-#include "engine.h"
+#include "qoraal-engine/config.h"
+#include "qoraal-engine/engine.h"
 #include "port/port.h"
-#include "parts/parts.h"
+#include "qoraal-engine/parts/parts.h"
 #include "tool/parse.h"
 
 
