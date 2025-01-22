@@ -299,6 +299,8 @@ engine_log (PENGINE_T engine, uint32_t type, const char* fmt_str, ...)
             engine_port_log (engine ? engine->idx : -1, fmt_str, args) ;
 
     }
+
+    va_end (args) ;
 }
 
 
