@@ -8,11 +8,11 @@
             "type": "cppdbg",
             "request": "launch",
             "name": "Launch(gdb)",
-            "program": "${workspaceFolder}/build/qoraal-engine.exe",
+            "program": "${workspaceFolder}/build/test/toaster",
             "cwd": "${workspaceRoot}",
             "args": [
                 //"./test/toaster.e"
-                "./test/utests/timers_test.e"
+                "./test/toaster.e"
             ]
 
         }

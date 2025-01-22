@@ -245,7 +245,7 @@ qoraal_print (const char *format)
 void
 qoraal_assert (const char *format)
 {
-    printf (format) ;
+    printf ("%s", format) ;
     abort () ;
 }
 
