@@ -22,7 +22,7 @@
  */
 
 #include "qoraal-engine/config.h"
-#if CFG_USE_ENGINE_ENGINE
+#if !defined CFG_ENGINE_ENGINE_PART_DISABLE
 
 #include <stdint.h>
 #include <string.h>
@@ -199,7 +199,6 @@ inst_set_task (PENGINE_T engine, uint32_t idx, PENGINE_EVENT_T task)
     }
 
     return 0 ;
-
 }
 
 PENGINE_EVENT_T
@@ -339,7 +338,7 @@ do_state_timer1 (PENGINE_T instance, uint32_t parm, uint32_t flags, uint32_t mul
         }
         inst_set_task (instance, STATE_TASK_TIMER1, task) ;
 
-    } 
+    }
 
     return ret / mult ;
 }
@@ -1410,6 +1409,6 @@ action_p_add (PENGINE_T instance, uint32_t parm, uint32_t flags)
     return value ;
 }
 
-#endif /* CFG_USE_ENGINE_ENGINE */
+#endif /* CFG_ENGINE_ENGINE_PART_DISABLE */
 
     /**@}*/

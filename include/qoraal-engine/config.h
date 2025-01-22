@@ -3,16 +3,26 @@
 #define __ENGINE_CONFIG_H__
 
 
+/* CFG_ENGINE_CONSOLE_PART_DISABLE
+    If defined, the console part will be disabled.
+*/
+// #define CFG_ENGINE_CONSOLE_PART_DISABLE    1
+
+/* CFG_ENGINE_DEBUG_PART_DISABLE
+    If defined, the debug part will be disabled.
+*/
+// #define CFG_ENGINE_DEBUG_PART_DISABLE    1
+
+/* CFG_ENGINE_ENGINE_PART_DISABLE
+    If defined, the engine part will be disabled.
+*/
+// #define CFG_ENGINE_ENGINE_PART_DISABLE    1
 
 
-
-#define CFG_USE_REGISTRY                0
-#define CFG_USE_STRSUB                  1
-#define CFG_USE_ENGINE_CONSOLE          1
-#define CFG_USE_ENGINE_DEBUG            1
-#define CFG_USE_ENGINE_ENGINE           1
-#define CFG_USE_ENGINE_TOASTER          1
-
+/* CFG_ENGINE_REGISTRY_DISABLE
+    If defined, the registry will be disabled.
+*/
+#define CFG_ENGINE_REGISTRY_DISABLE    1
 
 
 

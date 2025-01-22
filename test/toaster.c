@@ -21,8 +21,7 @@
     SOFTWARE.
  */
 
-#include "qoraal-engine/config.h"
-#if  CFG_USE_ENGINE_TOASTER
+
 #include <stdio.h>
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
@@ -115,5 +114,3 @@ action_toaster_lamp (PENGINE_T instance, uint32_t parm, uint32_t flags)
     return ENGINE_OK ;
 }
 
-
-#endif /* CFG_USE_ENGINE_TOASTER */

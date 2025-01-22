@@ -5,11 +5,12 @@
 
 
 
-__Engine__ is designed to execute sophisticated, hierarchical state machines with guards. State machines are assembled from individual parts, parsed from a machine definition file written in Engine Machine Language.
+__Engine__ is designed to execute advanced, hierarchical state machines with guard conditions. State machines are assembled from individual parts, parsed from a machine definition file written in Engine Machine Language.
 
-__Tool__, the integrated compiler, transforms these Engine Machine Language files into byte code, ready for execution by Engine. Fast, efficient, and lightweight, Tool is perfect for just-in-time compilation, minimizing overhead and seamlessly integrating with your application.
+__Tool__, the integrated compiler, converts Engine Machine Language files into optimized byte code, ready for execution by Engine. Lightweight and efficient, Tool enables just-in-time compilation with minimal overhead, ensuring seamless integration into your application.
 
-__Engine__ with __Tool__ is tailor-made for embedded C or C++ applications, providing a powerful and efficient solution for real-time state machine management, ensuring optimal performance.
+__Engine__ with __Tool__ are purpose-built for embedded C or C++ applications, offering a powerful, high-performance solution for real-time state machine management. Together, they ensure optimal efficiency and reliability.
+
 
 ## The Proverbial "Toaster Oven"
 You might be surprised to hear that Engine was designed for use with deeply embedded systems. To better understand how this works, let's consider a simple example, the proverbial "Toaster Oven":
@@ -136,13 +137,15 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
+cd ..
 ```
-> :bulb: On Wondows try: ```cmake -G "MinGW Makefiles" ..```
-> :bulb: To do a clean build, start with: ``` cmake --build . --target clean ``` or, if you want to check out qoraal again: ```rm -rf _deps```
+> :bulb: Or use the script 'build_and_run.sh' on Linux or 'build_and_run.bat' on Windows.
+
+> :bulb: To do a clean build, start with: ``` cmake --build . --target clean ``` or, if you want to check out qoraal again: ```rm -rf build/_deps```
 
 now start the engine to run the toaster with the folloing command:
 ```
-./qoraal-engine ../test/toaster.e
+./build/qoraal-engine ./test/toaster.e
 ```
 > :bulb: Use the --help option to display the command line syntax: ``` ./build/engine  --help ``` 
 

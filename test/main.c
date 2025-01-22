@@ -28,7 +28,7 @@ struct option opt_parm[] = {
     { 0,0,0,0 },
 };
 
-char *              opt_file = "./test/toaster.e";
+char *              opt_file = 0 ;
 bool                opt_verbose = false ;
 bool                opt_list = false ;
 char *              opt_config_file = 0;

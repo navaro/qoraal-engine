@@ -815,7 +815,7 @@ int ParserVariablesDeclare (struct LexState * Lexer, enum LexToken Token, struct
                 engine_port_variable_write (idx - ENGINE_REGISTER_COUNT, intval) ;
 
             } 
-#if CFG_USE_REGISTRY            
+#if !defined CFG_ENGINE_REGISTRY_DISABLE     
             else if (PARSER_ID_TYPE(Parm.Id) == parseRegId) {
                 if (registry_int32_get (Parm.Val.Identifier, &intval) != ENGINE_OK) {
                     PARSER_REPORT(statemachine->logif,

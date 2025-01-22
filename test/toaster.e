@@ -3,7 +3,7 @@ decl_version    2
 
 decl_variables {
     Timer = 20 /* Reload value for timer. The value will
-                               be read from the config file for [timer.default]. */
+                  be read from the config file for [timer.default]. */
 }
 
 /* Actions can dispatch evets into their own state machines. We
@@ -108,7 +108,6 @@ statemachine Toaster_controller {
         enter       (debug_log_statemachine, "Toaster_oven")
         enter       (debug_log_level, [LogLevel])
         enter       (debug_log_output, [LogOutput])
-        action_ld   (_state_start, [Timer], get, [timer.default])
         event       (_state_start, menu_ctrl)
     }
     

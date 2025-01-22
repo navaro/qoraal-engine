@@ -26,17 +26,22 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <qoraal/qoraal.h>
 #include <qoraal/svc/svc_shell.h>
 #include <qoraal/common/lists.h>
+#include <qoraal/common/strsub.h>
 #include "qoraal-engine/engine.h"
 #include "port.h"
 #include "../tool/parse.h"
+
 
 #define SERVICE_ENGINE_TASK_QUEUE       SERVICE_PRIO_QUEUE2
 #define ENGINE_TASK_HEAP_STORE          (1<<0)
 #define ENGINE_TASK_STORE_CNT           20
 #define ENGINE_MAX_VARIABLES            100
+
+#define ENGINE_USE_STRSUB               1
 
 
 /**
@@ -52,20 +57,19 @@ typedef struct ENGINE_EVENT_S {
 static LISTS_STACK_DECL(    _engine_task_store) ;
 static int32_t              _engine_task_store_cnt = -1 ;
 static int32_t              _engine_task_store_alloc = 0 ;
-static OS_MUTEX_DECL(       _engine_task_mutex);
+static p_mutex_t            _engine_task_mutex = 0 ;
 static ENGINE_EVENT_T       _engine_task_store_heap[ENGINE_TASK_STORE_CNT] ;
 static int32_t              _engine_variables[ENGINE_MAX_VARIABLES] = {0} ;
 
 static uint32_t             _engine_alloc[2] = {0} ;
 static uint32_t             _engine_alloc_max[2] = {0} ;
 
-#if CFG_UTILS_STRSUB
-static int32_t              engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uint32_t arg) ;
+#if ENGINE_USE_STRSUB
+static int32_t              engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uintptr_t arg) ;
 static STRSUB_HANDLER_T     _engine_strsub ;
 #endif
 
-static OS_MUTEX_DECL(       _engine_mutex);
-
+static p_mutex_t            _engine_mutex ;
 
 
 static inline ENGINE_EVENT_T*
@@ -160,10 +164,8 @@ int32_t
 engine_port_init (void * arg)
 {
     engine_task_init () ;
-    os_mutex_init (&_engine_task_mutex) ;
-    os_mutex_init (&_engine_mutex) ;
 
-#if CFG_UTILS_STRSUB
+#if ENGINE_USE_STRSUB
     strsub_install_handler(0, StrsubToken1, &_engine_strsub, engine_strsub_cb) ;
 #endif
 
@@ -173,6 +175,8 @@ engine_port_init (void * arg)
 int32_t
 engine_port_start (void)
 {
+    if (os_mutex_create (&_engine_task_mutex) != EOK) return EFAIL ;
+    if (os_mutex_create (&_engine_mutex) != EOK) return ENGINE_FAIL ;
 
     return ENGINE_OK ;
 }
@@ -180,6 +184,9 @@ engine_port_start (void)
 void
 engine_port_stop (void)
 {
+    os_mutex_delete (&_engine_task_mutex) ;
+    os_mutex_delete (&_engine_mutex) ;
+
     engine_task_wait () ;
 }
 
@@ -312,8 +319,6 @@ engine_port_assert (const char *msg)
     qoraal_debug_assert(msg)  ;
 }
 
-
-
 int32_t
 engine_port_variable_write (uint32_t idx, int32_t val)
 {
@@ -382,9 +387,9 @@ engine_timestamp (void)
 
 }
 
-#if CFG_UTILS_STRSUB
+#if ENGINE_USE_STRSUB
 int32_t
-engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uint32_t arg)
+engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uintptr_t arg)
 {
     int32_t res = E_INVAL ;
     uint32_t idx ;
@@ -411,9 +416,9 @@ engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t o
 }
 #endif
 
-#if CFG_UTILS_STRSUB
+#if ENGINE_USE_STRSUB
 static int32_t
-parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uint32_t arg)
+parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uintptr_t arg)
 {
 #define SERVICES_STRSUB_BUFFER_LEN          12
     int32_t res = ENGINE_FAIL ;
@@ -444,7 +449,7 @@ parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t off
 const char *
 engine_port_sanitize_string (const char * string, uint32_t * plen)
 {
-#if CFG_UTILS_STRSUB
+#if ENGINE_USE_STRSUB
     #pragma GCC diagnostic ignored  "-Wmissing-braces"
     STRSUB_INSTANCE_T  strsub_instance = {STRSUB_ESCAPE_TOKEN, STRSUB_HANDLERS_TOKENS, {0}} ;
     STRSUB_HANDLER_T    strsub ;
@@ -464,7 +469,7 @@ engine_port_sanitize_string (const char * string, uint32_t * plen)
 void
 engine_port_release_string (const char * string)
 {
-#if CFG_UTILS_STRSUB
+#if ENGINE_USE_STRSUB
     qoraal_free ((void*)string) ;
 #endif
 }

@@ -22,16 +22,13 @@
  */
 
 #include "qoraal-engine/config.h"
-#if CFG_USE_ENGINE_DEBUG
+#if !defined CFG_ENGINE_DEBUG_PART_DISABLE
 #include <stdio.h>
 #include <ctype.h>
 #include <limits.h>
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 
-#if CFG_UTILS_STRSUB
-#include <coral-utils/common/strsub.h>
-#endif
 
 
 /*===========================================================================*/
@@ -201,4 +198,4 @@ action_debug_dump (PENGINE_T instance, uint32_t parm, uint32_t flags)
     return ENGINE_OK ;
 }
 
-#endif /* CFG_USE_ENGINE_DEBUG */
+#endif /* CFG_ENGINE_DEBUG_PART_DISABLE */

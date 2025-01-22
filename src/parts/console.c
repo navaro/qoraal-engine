@@ -22,16 +22,14 @@
  */
 
 #include "qoraal-engine/config.h"
-#if CFG_USE_ENGINE_CONSOLE
+#if !defined CFG_ENGINE_CONSOLE_PART_DISABLE
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 #include <qoraal/qoraal.h>
-#if CFG_USE_STRSUB
-#include "qoraal/common/strsub.h"
-#endif
+
 
 
 /*===========================================================================*/
@@ -134,14 +132,7 @@ action_console_write (PENGINE_T instance, uint32_t parm, uint32_t flags)
     str = parts_get_string(instance, parm, flags) ;
 
     if (str) {
-
-#if CFG_USE_STRSUB
-        char buffer[96] ;
-        strsub_parse_string_to (0, str, strlen(str), buffer, 96) ;
-        console_out (buffer) ;
-#else
         console_out (str) ;
-#endif
 
     }
 
@@ -185,4 +176,4 @@ engine_console_event (uint16_t event, uint32_t ch)
 
 
 
-#endif /* CFG_USE_ENGINE_CONSOLE */
+#endif /* CFG_ENGINE_CONSOLE_PART_DISABLE */

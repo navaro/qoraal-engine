@@ -215,7 +215,7 @@ parts_find_event_id (const char* name)
 int32_t
 parts_valadate_string (PENGINE_T instance, uint32_t parm, uint32_t flags)
 {
-#if CFG_USE_REGISTRY
+#if !defined CFG_ENGINE_REGISTRY_DISABLE
     if (flags & PART_ACTION_FLAG_INDEXED) {
             const char * str = engine_get_string (instance, parm, 0) ;
             if (str) {
@@ -256,7 +256,7 @@ int32_t
 parts_valadate_int (PENGINE_T instance, uint32_t parm, uint32_t flags, int32_t min, int32_t max)
 {
     int32_t value ;
-#if CFG_USE_REGISTRY
+#if !defined CFG_ENGINE_REGISTRY_DISABLE
     if (flags & PART_ACTION_FLAG_INDEXED) {
         const char * str = engine_get_string (instance, parm, 0) ;
         if (str) {
@@ -298,7 +298,7 @@ const char*
 parts_copy_string(PENGINE_T instance, uint32_t parm, uint32_t flags, char* buffer, int len)
 {
     buffer[0] = '\0' ;
-#if CFG_USE_REGISTRY
+#if !defined CFG_ENGINE_REGISTRY_DISABLE
     if (flags & PART_ACTION_FLAG_INDEXED) {
         const char * str = engine_get_string (instance, parm, 0) ;
         if (str) {
@@ -339,7 +339,7 @@ int32_t
 parts_get_int(PENGINE_T instance, uint32_t parm, uint32_t flags, int32_t min, int32_t max)
 {
     int32_t value = 0 ;
-#if CFG_USE_REGISTRY
+#if !defined CFG_ENGINE_REGISTRY_DISABLE
     if (flags & PART_ACTION_FLAG_INDEXED) {
         const char * str = engine_get_string (instance, parm, 0) ;
         if (str) {

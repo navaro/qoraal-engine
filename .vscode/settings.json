@@ -17,6 +17,7 @@
         "string.h": "c",
         "os.h": "c",
         "qoraal.h": "c",
-        "svc_services.h": "c"
+        "svc_services.h": "c",
+        "strsub.h": "c"
     }
 }

@@ -2,10 +2,12 @@ decl_name       "timers test"
 decl_version    1
 
 decl_variables {
+    Timer = 20
 }
 
 decl_events {
     _evt_Start
+    _evt_Start2
     _evt_WriteMenu
 }
 
@@ -14,11 +16,20 @@ statemachine tasks_test {
     startstate s1
 
     state s1 {
-        enter (state_keepalive1, 0)
-        enter (state_keepalive2, 0)
+        enter  (state_keepalive1, 0)
+        enter  (state_keepalive2, 0)
 		action (_evt_Start, state_keepalive1, 800) 
 		action (_evt_Start, state_keepalive2, 600) 
-        event (_evt_Start, s2)
+        event  (_evt_Start, s2)
+
+        //action (_evt_Start2, state_timer1_sec, [Timer])
+        event  (_evt_Start2, t2)
+ 
+    }
+
+    state t2 {
+        enter (state_timer1_sec, [Timer])
+        event (_state_timer1, s1)
  
     }
 
@@ -89,11 +100,13 @@ statemachine test_controller {
         action          (_state_start, state_event_local, _evt_WriteMenu)
 
         action          (_evt_WriteMenu, console_writeln, "Control menu:")
-        action          (_evt_WriteMenu, console_writeln, "    \\[s] Start.")
+        action          (_evt_WriteMenu, console_writeln, "    \\[1] Test 1.")
+        action          (_evt_WriteMenu, console_writeln, "    \\[2] Test 2.")
         action          (_evt_WriteMenu, console_writeln, "    \\[?] Help.")
         action          (_evt_WriteMenu, console_writeln, "    \\[D] Dump state.")
 
-        action_eq_e     (_console_char, 's', state_event, _evt_Start)
+        action_eq_e     (_console_char, '1', state_event, _evt_Start)
+        action_eq_e     (_console_char, '2', state_event, _evt_Start2)
         action_eq_e     (_console_char, '?', state_event_local, _evt_WriteMenu)
         action_eq_e     (_console_char, 'D', debug_dump)
 
