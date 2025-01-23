@@ -28,6 +28,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#if !defined CFG_ENGINE_REGISTRY_DISABLE
+#include "qoraal-flash/registry.h"
+#endif
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 #include "../port/port.h"

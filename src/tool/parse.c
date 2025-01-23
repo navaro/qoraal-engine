@@ -34,6 +34,9 @@
 #include "collection.h"
 #include "lex.h"
 #include "machine.h"
+#if !defined CFG_ENGINE_REGISTRY_DISABLE
+#include "qoraal-flash/registry.h"
+#endif
 #include "qoraal-engine/engine.h"
 
 
@@ -324,39 +327,40 @@ parse_install_string (struct collection * dict, const char* name, int len, unsig
     struct clist * np ;
     int res = 0 ;
 
-    if (len == 0) {
+    if (len == 0 || !name) {
         name = "" ;
 
     }
 
     const char * newname = engine_port_sanitize_string (name, (uint32_t *)&len)  ;
 
-    if (newname) {
-        np = collection_get(dict, newname, len) ;
-        if (!np) {
-            np = collection_install_size(dict, newname, len, sizeof(unsigned int)*PARSER_INSTALL_STRING_SIZE) ;
-            if (np) {
-                *(unsigned int*)collection_get_value (dict, np) = id ;
-                if (Value->Typ == TypeInt) {
-                    ((unsigned int*)collection_get_value (dict, np))[1] = Value->Val.Integer ;
-                } else {
-                    ((unsigned int*)collection_get_value (dict, np))[1] = 0 ;
+    if (newname) name = newname ;
 
-                }
+    np = collection_get(dict, name, len) ;
 
-                res =  1 ;
-            }
-         }
+    if (!np) {
+        np = collection_install_size(dict, name, len, sizeof(unsigned int)*PARSER_INSTALL_STRING_SIZE) ;
         if (np) {
-            Value->Id = *(unsigned int*)collection_get_value (dict, np) ;
-            Value->Typ = TypeCharPointer;
-            Value->Val.Pointer = (char*)collection_get_key (dict, np);
+            *(unsigned int*)collection_get_value (dict, np) = id ;
+            if (Value->Typ == TypeInt) {
+                ((unsigned int*)collection_get_value (dict, np))[1] = Value->Val.Integer ;
+            } else {
+                ((unsigned int*)collection_get_value (dict, np))[1] = 0 ;
 
+            }
+
+            res =  1 ;
         }
-
-        engine_port_release_string (newname) ;
+        }
+    if (np) {
+        Value->Id = *(unsigned int*)collection_get_value (dict, np) ;
+        Value->Typ = TypeCharPointer;
+        Value->Val.Pointer = (char*)collection_get_key (dict, np);
 
     }
+
+    if (newname) engine_port_release_string (newname) ;
+
 
     return res ;
 }

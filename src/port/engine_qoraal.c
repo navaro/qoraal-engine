@@ -64,7 +64,7 @@ static int32_t              _engine_variables[ENGINE_MAX_VARIABLES] = {0} ;
 static uint32_t             _engine_alloc[2] = {0} ;
 static uint32_t             _engine_alloc_max[2] = {0} ;
 
-#if ENGINE_USE_STRSUB
+#if !defined CFG_ENGINE_STRSUB_DISABLE
 static int32_t              engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uintptr_t arg) ;
 static STRSUB_HANDLER_T     _engine_strsub ;
 #endif
@@ -75,7 +75,7 @@ static p_mutex_t            _engine_mutex ;
 static inline ENGINE_EVENT_T*
 engine_task_alloc (void) {
 #if !ENGINE_TASK_STORE_CNT
-    return (ENGINE_EVENT_T*)qoraal_malloc (sizeof(ENGINE_EVENT_T)) ;
+    return (ENGINE_EVENT_T*)qoraal_malloc (QORAAL_HeapAuxiliary, sizeof(ENGINE_EVENT_T)) ;
 #else
     os_mutex_lock (&_engine_task_mutex) ;
     _engine_task_store_alloc++ ;
@@ -93,7 +93,7 @@ engine_task_alloc (void) {
 
     } else {
         os_mutex_unlock (&_engine_task_mutex) ;
-        task = (ENGINE_EVENT_T*)qoraal_malloc (sizeof(ENGINE_EVENT_T)) ;
+        task = (ENGINE_EVENT_T*)qoraal_malloc (QORAAL_HeapAuxiliary, sizeof(ENGINE_EVENT_T)) ;
         svc_tasks_init_task (&task->task) ;
 
     }
@@ -105,7 +105,7 @@ engine_task_alloc (void) {
 static inline void
 engine_task_free(ENGINE_EVENT_T* task) {
 #if !ENGINE_TASK_STORE_CNT
-    qoraal_free(task) ;
+    qoraal_free(QORAAL_HeapAuxiliary, task) ;
 #else
     os_mutex_lock (&_engine_task_mutex) ;
     _engine_task_store_alloc-- ;
@@ -118,7 +118,7 @@ engine_task_free(ENGINE_EVENT_T* task) {
         os_mutex_unlock (&_engine_task_mutex) ;
     } else {
         os_mutex_unlock (&_engine_task_mutex) ;
-        qoraal_free(task) ;
+        qoraal_free(QORAAL_HeapAuxiliary, task) ;
     }
 #endif
 }
@@ -165,7 +165,7 @@ engine_port_init (void * arg)
 {
     engine_task_init () ;
 
-#if ENGINE_USE_STRSUB
+#if !defined CFG_ENGINE_STRSUB_DISABLE
     strsub_install_handler(0, StrsubToken1, &_engine_strsub, engine_strsub_cb) ;
 #endif
 
@@ -193,7 +193,7 @@ engine_port_stop (void)
 void*
 engine_port_malloc (portheap heap, uint32_t size)
 {
-    uint32_t * mem = qoraal_malloc(size + sizeof(uint32_t)) ;
+    uint32_t * mem = qoraal_malloc(QORAAL_HeapAuxiliary, size + sizeof(uint32_t)) ;
     if (mem) {
         _engine_alloc[heap] += size ;
         if (_engine_alloc_max[heap] < _engine_alloc[heap]) {
@@ -213,7 +213,7 @@ engine_port_free (portheap heap, void* mem)
     if (mem) {
         uint32_t * pmem = (uint32_t*)mem - 1 ;
         _engine_alloc[heap] -= *pmem ;
-        qoraal_free (pmem) ;
+        qoraal_free (QORAAL_HeapAuxiliary, pmem) ;
     }
 }
 
@@ -387,7 +387,7 @@ engine_timestamp (void)
 
 }
 
-#if ENGINE_USE_STRSUB
+#if !defined CFG_ENGINE_STRSUB_DISABLE
 int32_t
 engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uintptr_t arg)
 {
@@ -416,7 +416,7 @@ engine_strsub_cb (STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t o
 }
 #endif
 
-#if ENGINE_USE_STRSUB
+#if !defined CFG_ENGINE_STRSUB_DISABLE
 static int32_t
 parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t offset, uintptr_t arg)
 {
@@ -449,28 +449,28 @@ parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t off
 const char *
 engine_port_sanitize_string (const char * string, uint32_t * plen)
 {
-#if ENGINE_USE_STRSUB
+#if !defined CFG_ENGINE_STRSUB_DISABLE
     #pragma GCC diagnostic ignored  "-Wmissing-braces"
     STRSUB_INSTANCE_T  strsub_instance = {STRSUB_ESCAPE_TOKEN, STRSUB_HANDLERS_TOKENS, {0}} ;
     STRSUB_HANDLER_T    strsub ;
     strsub_install_handler(&strsub_instance, StrsubToken1, &strsub, parse_strsub_cb) ;
-    uint32_t dstlen = strsub_parse_get_dst_length (&strsub_instance, string, *plen) ;
-    char * newname = qoraal_malloc( dstlen) ;
-    if (newname) {
-        *plen = strsub_parse_string_to (&strsub_instance, string, *plen, newname, dstlen) ;
+    int32_t dstlen = strsub_parse_get_dst_length (&strsub_instance, string, *plen) ;
+    if (dstlen > 0) {
+        char * newname = qoraal_malloc(QORAAL_HeapAuxiliary, dstlen) ;
+        if (newname) {
+            *plen = strsub_parse_string_to (&strsub_instance, string, *plen, newname, dstlen) ;
+        }
+        return newname ;
     }
-    return newname ;
-#else
-    return string ;
 #endif
-
+    return 0 ;
 }
 
 void
 engine_port_release_string (const char * string)
 {
-#if ENGINE_USE_STRSUB
-    qoraal_free ((void*)string) ;
+#if !defined CFG_ENGINE_STRSUB_DISABLE
+    qoraal_free (QORAAL_HeapAuxiliary, (void*)string) ;
 #endif
 }
 

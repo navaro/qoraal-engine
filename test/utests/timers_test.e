@@ -16,6 +16,7 @@ statemachine tasks_test {
     startstate s1
 
     state s1 {
+        enter  (console_writeln, "timer test [Timer].")
         enter  (state_keepalive1, 0)
         enter  (state_keepalive2, 0)
 		action (_evt_Start, state_keepalive1, 800) 
@@ -100,10 +101,10 @@ statemachine test_controller {
         action          (_state_start, state_event_local, _evt_WriteMenu)
 
         action          (_evt_WriteMenu, console_writeln, "Control menu:")
-        action          (_evt_WriteMenu, console_writeln, "    \\[1] Test 1.")
-        action          (_evt_WriteMenu, console_writeln, "    \\[2] Test 2.")
-        action          (_evt_WriteMenu, console_writeln, "    \\[?] Help.")
-        action          (_evt_WriteMenu, console_writeln, "    \\[D] Dump state.")
+        action          (_evt_WriteMenu, console_writeln, "    1. Test 1.")
+        action          (_evt_WriteMenu, console_writeln, "    2. Test 2.")
+        action          (_evt_WriteMenu, console_writeln, "    3. Help.")
+        action          (_evt_WriteMenu, console_writeln, "    4. Dump state.")
 
         action_eq_e     (_console_char, '1', state_event, _evt_Start)
         action_eq_e     (_console_char, '2', state_event, _evt_Start2)

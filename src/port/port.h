@@ -101,9 +101,6 @@ extern "C" {
 
     extern uint32_t     engine_timestamp (void) ;
 
-    int32_t             registry_int32_get (const char*  id, int32_t* value) ;
-    uint32_t            registry_string_get (const char*  id, char* value, unsigned int length ) ;
-
 
 #ifdef __cplusplus
 }

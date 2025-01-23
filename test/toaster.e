@@ -1,9 +1,16 @@
 decl_name       "Toaster Oven"
 decl_version    2
 
+/* Load the registry with some default values. */
+decl_startup {
+    "regadd timer.short      5"
+    "regadd timer.default    10"
+    "regadd timer.long       30"
+    "regadd toaster.name     'My Toaster'"
+}
+
 decl_variables {
-    Timer = 20 /* Reload value for timer. The value will
-                  be read from the config file for [timer.default]. */
+    Timer = 10  /* Reload value for timer. */
 }
 
 /* Actions can dispatch evets into their own state machines. We

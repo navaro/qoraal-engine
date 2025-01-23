@@ -9,6 +9,7 @@
 #include "qoraal/svc/svc_logger.h"
 #include "qoraal-engine/starter.h"
 #include "qoraal-engine/parts/parts_events.h"
+#include "platform/platform.h"
 
 #define ENGINE_VERSION_STR      "Navaro Qoraal Engine Demo v '" __DATE__ "'"
 
@@ -55,8 +56,6 @@ usage(char* comm)
 
 static int32_t  out(void* ctx, uint32_t out, const char* str) ;
 static void     list(void* ctx, starter_list_t type, const char * name, const char* description) ;
-static char *   get_config_file(void) ;
-static void     qoraal_start (void) ;
 
 
 int
@@ -68,7 +67,8 @@ main(int argc, char* argv[])
     printf (ENGINE_VERSION_STR) ;
     printf ("\r\n\r\n") ;
 
-    qoraal_start () ;
+    platform_init () ;
+    platform_start () ;
 
     /*
      * Parse the command line parameters.
@@ -149,7 +149,7 @@ main(int argc, char* argv[])
       * Compile the Machine Definition File and start the Engine.
       */
      printf("starting \"%s\"...\r\n\r\n", opt_file);
-     starter_init (get_config_file ()) ;
+     starter_init (0) ;
      res = starter_start_ex (buffer, sz, 0, out, opt_verbose) ;
      free (buffer) ;
 
@@ -180,37 +180,6 @@ main(int argc, char* argv[])
      return 0;
 }
 
-static char *
-get_config_file (void)
-{
-    static char config_file[FILENAME_MAX+4] ;
-    memset (config_file, 0, FILENAME_MAX) ;
-
-    if (opt_config_file) {
-        strncpy(config_file, opt_config_file, FILENAME_MAX-1);
-
-    }
-    else if (opt_file) {
-
-        strncpy(config_file,opt_file,FILENAME_MAX-1);
-
-        char *end = config_file + strlen(config_file);
-
-        while (end > config_file && *end != '.') {
-            --end;
-        }
-
-        if (end > config_file) {
-            *end = '\0';
-        }
-
-        strcat (config_file, ".cfg") ;
-
-
-    }
-
-    return (char*) config_file ;
-}
 
 static void
 list(void* ctx, starter_list_t type, const char * name, const char* description)
@@ -235,36 +204,4 @@ out(void* ctx, uint32_t out, const char* str)
 
     return 0 ;
 }
-
-void
-qoraal_print (const char *format)
-{
-    printf ("%s", format) ;
-}
-
-void
-qoraal_assert (const char *format)
-{
-    printf ("%s", format) ;
-    abort () ;
-}
-
-void
-logger_cb (void* channel, LOGGERT_TYPE_T type, uint8_t facility, const char* msg)
-{
-    printf("--- %s\n", msg) ;
-}
-
-void
-qoraal_start (void)
-{
-    static const QORAAL_CFG_T       qoraal_cfg = { .malloc = malloc, .free = free, .debug_print = qoraal_print, .debug_assert = qoraal_assert, .current_time = 0, .wdt_kick = 0};
-    static LOGGER_CHANNEL_T         log_channel = { .fp = logger_cb, .user = (void*)0, .filter = { { .mask = SVC_LOGGER_MASK, .type = SVC_LOGGER_SEVERITY_LOG | SVC_LOGGER_FLAGS_PROGRESS }, {0,0} } };
-    qoraal_instance_init (&qoraal_cfg) ;
-    qoraal_svc_init (0) ;
-    os_sys_start () ;
-    qoraal_svc_start () ;
-    svc_logger_channel_add (&log_channel) ;
-}
-
 

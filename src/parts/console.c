@@ -29,7 +29,9 @@
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 #include <qoraal/qoraal.h>
-
+#if !defined CFG_ENGINE_STRSUB_DISABLE
+#include "qoraal/common/strsub.h"
+#endif
 
 
 /*===========================================================================*/
@@ -132,7 +134,14 @@ action_console_write (PENGINE_T instance, uint32_t parm, uint32_t flags)
     str = parts_get_string(instance, parm, flags) ;
 
     if (str) {
+
+#if !defined CFG_ENGINE_STRSUB_DISABLE
+        char buffer[96] ;
+        strsub_parse_string_to (0, str, strlen(str), buffer, 96) ;
+        console_out (buffer) ;
+#else
         console_out (str) ;
+#endif
 
     }
 

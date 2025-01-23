@@ -12,7 +12,7 @@
             "cwd": "${workspaceRoot}",
             "args": [
                 //"./test/toaster.e"
-                "./test/toaster.e"
+                "./test/utests/timers_test.e"
             ]
 
         }
