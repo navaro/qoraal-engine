@@ -5,6 +5,7 @@ set(TEST_SRCS
 )
 
 add_executable(toaster ${TEST_SRCS})
+target_compile_definitions(qoraal PRIVATE CFG_OS_POSIX)
 
 # If you want debugging turned off, change -O0 -g or remove them
 target_link_libraries(toaster PRIVATE qoraal qoraal-flash qoraal-engine pthread)

@@ -3,9 +3,9 @@ decl_version    2
 
 /* Load the registry with some default values. */
 decl_startup {
-    "regadd timer.short      5"
-    "regadd timer.default    10"
-    "regadd timer.long       30"
+    "regadd timer.short      5 &"
+    "regadd timer.default    10 &"
+    "regadd timer.long       30 &"
     "regadd toaster.name     'My Toaster'"
 }
 

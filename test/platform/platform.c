@@ -24,14 +24,15 @@ int32_t     platform_flash_erase (uint32_t addr_start, uint32_t addr_end) ;
 static uint8_t        _platform_flash[PLATFORM_FLASH_SIZE]  ;
 
 
-REGISTRY_INSTANCE_DECL(_regdef_nvol3_entry, \
-        platform_flash_read, platform_flash_write, platform_flash_erase, \
-        0, (64*1024), 
+REGISTRY_INSTANCE_DECL(registry_cfg, \
+        0, 
+        (64*1024), 
         24, 
         128, 
         101)
 
 static const QORAAL_CFG_T       qoraal_cfg = { .malloc = platform_malloc, .free = platform_free, .debug_print = platform_print, .debug_assert = platform_assert, .current_time = platform_current_time, .wdt_kick = platform_wdt_kick};
+static const QORAAL_FLASH_CFG_T qoraal_flash_cfg = { .flash_read = platform_flash_read, .flash_write = platform_flash_write, .flash_erase = platform_flash_erase};
 static LOGGER_CHANNEL_T         log_channel = { .fp = platform_logger_cb, .user = (void*)0, .filter = { { .mask = SVC_LOGGER_MASK, .type = SVC_LOGGER_SEVERITY_LOG | SVC_LOGGER_FLAGS_PROGRESS }, {0,0} } };
 
 
@@ -47,6 +48,7 @@ platform_start ()
     os_thread_sleep (100) ;
 
     qoraal_instance_init (&qoraal_cfg) ;
+    qoraal_flash_instance_init (&qoraal_flash_cfg) ;
     qoraal_svc_init (0) ;
     os_sys_start () ;
     qoraal_svc_start () ;
@@ -54,7 +56,7 @@ platform_start ()
     svc_logger_channel_add (&log_channel) ;
     platform_flash_erase (0, PLATFORM_FLASH_SIZE-1) ;
     registry_init () ;
-    registry_start (&_regdef_nvol3_entry) ;
+    registry_start (&registry_cfg) ;
 
     return 0 ;
 }

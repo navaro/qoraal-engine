@@ -332,6 +332,7 @@ unsigned char LexUnEscapeCharacter(const char **From, const char *End)
         return *(*From)++;
 }
 
+#if 0
 /* get a string constant - used while scanning */
 enum LexToken LexGetStringConstant(struct LexState *Lexer, struct Value *Value, char EndChar)
 {
@@ -397,6 +398,162 @@ enum LexToken LexGetStringConstant(struct LexState *Lexer, struct Value *Value, 
     
     return TokenStringConstant;
 }
+#else
+/* get a string constant - used while scanning */
+enum LexToken LexGetStringConstant(struct LexState *Lexer, struct Value *Value, char EndChar)
+{
+    char *AccBuf = NULL;          /* Accumulated buffer for the final merged string */
+    size_t AccAllocated = 0;      /* How many bytes we've allocated for AccBuf so far */
+    size_t AccUsed = 0;           /* How many bytes of AccBuf are actually used */
+
+    for (;;)
+    {
+        /* --------- Parse a single quoted chunk --------- */
+        int Escape = FALSE;
+        const char *ChunkStart = Lexer->Pos;
+        const char *ChunkEnd;
+
+        while (Lexer->Pos != Lexer->End && (*Lexer->Pos != EndChar || Escape))
+        {
+            if (Escape)
+            {
+                if (*Lexer->Pos == '\r' && (Lexer->Pos+1) != Lexer->End)
+                    Lexer->Pos++;
+                
+                if (*Lexer->Pos == '\n' && (Lexer->Pos+1) != Lexer->End)
+                {
+                    Lexer->Line++;
+                    Lexer->Pos++;
+                    Lexer->CharacterPos = 0;
+                }
+                Escape = FALSE;
+            }
+            else if (*Lexer->Pos == '\\')
+            {
+                Escape = TRUE;
+            }
+            LEXER_INC(Lexer);
+        }
+
+        /* If we never found a closing quote, bail out */
+        if (Lexer->Pos == Lexer->End)
+        {
+            if (Lexer->cb->Error)
+                Lexer->cb->Error(Lexer, ErrorSyntax, "unterminated string literal");
+            if (AccBuf) LEX_FREE(AccBuf);
+            return TokenError;
+        }
+
+        ChunkEnd = Lexer->Pos;  /* points to the quote character (or end) */
+
+        /* Allocate a buffer to hold the unescaped chunk */
+        /* The chunk length is (ChunkEnd - ChunkStart), but we allocate exactly that 
+           because we'll do actual growth on AccBuf, not on this temp. */
+        size_t rawLen = (size_t)(ChunkEnd - ChunkStart);
+        char *EscBuf = (char*)LEX_MALLOC(rawLen);
+        if (!EscBuf)
+        {
+            if (Lexer->cb->Error)
+                Lexer->cb->Error(Lexer, ErrorMemory, "out of memory in string parse");
+            if (AccBuf) LEX_FREE(AccBuf);
+            return TokenError;
+        }
+
+        /* Unescape into EscBuf */
+        {
+            const char *p = ChunkStart;
+            char *outp = EscBuf;
+            while (p != ChunkEnd)
+            {
+                *outp++ = LexUnEscapeCharacter(&p, ChunkEnd);
+            }
+            rawLen = (size_t)(outp - EscBuf);  /* actual length after unescaping */
+        }
+
+        /* Now we append EscBuf into AccBuf. Let's do it the manual "expand if needed" way. */
+        {
+            size_t needed = AccUsed + rawLen + 1; /* +1 for the final null terminator */
+            if (needed > AccAllocated)
+            {
+                /* We need to grow AccBuf. Let's pick a new size. Could just do `needed`,
+                   or some doubling strategy, e.g. max(needed, AccAllocated*2) for fewer 
+                   allocations over time. */
+                size_t newAlloc = (AccAllocated == 0) ? needed : (AccAllocated * 2);
+                if (newAlloc < needed)
+                    newAlloc = needed;
+
+                /* Malloc a bigger chunk, copy from old if any, then free old. */
+                char *newBuf = (char*)LEX_MALLOC(newAlloc);
+                if (!newBuf)
+                {
+                    if (Lexer->cb->Error)
+                        Lexer->cb->Error(Lexer, ErrorMemory, "out of memory growing string buffer");
+                    LEX_FREE(EscBuf);
+                    if (AccBuf) LEX_FREE(AccBuf);
+                    return TokenError;
+                }
+
+                /* copy existing data */
+                if (AccBuf)
+                {
+                    memcpy(newBuf, AccBuf, AccUsed);
+                    LEX_FREE(AccBuf);
+                }
+
+                AccBuf = newBuf;
+                AccAllocated = newAlloc;
+            }
+
+            /* Now copy this chunk in */
+            memcpy(AccBuf + AccUsed, EscBuf, rawLen);
+            AccUsed += rawLen;
+            AccBuf[AccUsed] = '\0';
+        }
+
+        /* free the temporary buffer for the chunk */
+        LEX_FREE(EscBuf);
+
+        /* Consume the closing quote if present */
+        if (*Lexer->Pos == EndChar)
+            LEXER_INC(Lexer);
+
+        /* --------- Check if there's another adjacent string --------- */
+        /* skip whitespace/newlines to see if there's another quote right after */
+        while (Lexer->Pos < Lexer->End && isspace((unsigned char)*Lexer->Pos))
+        {
+            if (*Lexer->Pos == '\n')
+            {
+                Lexer->Line++;
+                Lexer->CharacterPos = 0;
+            }
+            LEXER_INC(Lexer);
+        }
+
+        /* If next char != EndChar, we stop. */
+        if (Lexer->Pos >= Lexer->End || *Lexer->Pos != EndChar)
+            break;
+
+        /* Otherwise, there's another adjacent string chunk. 
+           Skip the opening quote and parse the next chunk in the loop. */
+        LEXER_INC(Lexer);
+    }
+
+    /* We have the final, merged string in AccBuf. Time to call GetString(). */
+    if (Lexer->cb->GetString && 
+        !Lexer->cb->GetString(Lexer, AccBuf, AccUsed, Value))
+    {
+        LEX_FREE(AccBuf);
+        if (Lexer->cb->Error)
+            Lexer->cb->Error(Lexer, ErrorMemory, "out of memory storing final string");
+        return TokenError;
+    }
+
+    /* done! free our local buffer if the callback didn't store it internally */
+    LEX_FREE(AccBuf);
+
+    return TokenStringConstant;
+}
+#endif
 
 /* get a string constant - used while scanning */
 enum LexToken LexGetIndexConstant(struct LexState *Lexer, struct Value *Value)
