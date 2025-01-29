@@ -360,7 +360,7 @@ int32_t
 engine_port_shellcmd (const char* shellcmd)
 {
     int32_t res = ENGINE_FAIL ;
-    char    cmd[128]     ;
+    char  *  cmd     ;
 
 
     if (shellcmd && strlen(shellcmd)) {
@@ -369,10 +369,14 @@ engine_port_shellcmd (const char* shellcmd)
         svc_shell_if_init (&qshell_if, 0, _corshell_out, 0) ;
 
         int len = strlen (shellcmd) ;
-        if (len > 127) len = 127 ;
-        strncpy (cmd, shellcmd, len) ;
-        cmd[len] = '\0' ;
-        svc_shell_script_run (&qshell_if, "", cmd, len) ;
+        cmd = engine_port_malloc (heapParser, len+1) ;
+        if (cmd) {
+            strncpy (cmd, shellcmd, len) ;
+            cmd[len] = '\0' ;
+            svc_shell_script_run (&qshell_if, "", cmd, len) ;
+            engine_port_free (heapParser, cmd) ;
+
+        }
 
 
     }

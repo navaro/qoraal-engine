@@ -1,5 +1,4 @@
 set(TEST_SRCS
-    platform/platform.c
     toaster.c
     main.c
 )
@@ -17,7 +16,6 @@ target_compile_options(toaster PRIVATE -O0 -g)
 target_link_options(toaster PRIVATE
     "-Wl,--whole-archive"
     "$<TARGET_FILE:qoraal-engine>"
-    "$<TARGET_FILE:qoraal-flash>"
     "-Wl,--no-whole-archive"
 )
 
