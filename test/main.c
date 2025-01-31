@@ -178,7 +178,7 @@ main(int argc, char* argv[])
      * Lets get the engine started...
      */
     starter_init (0) ;
-    res = starter_start_ex (buffer, sz, 0, out, opt_verbose) ;
+    res = starter_start (buffer, sz, 0, out, opt_verbose) ;
     free (buffer) ;
 
     if (res) {

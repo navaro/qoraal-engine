@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/test/toaster",
             "cwd": "${workspaceRoot}",
             "args": [
-                "./test/toaster.e"
+                "./test/simple.e"
                 //"./test/utests/timers_test.e"
             ]
 

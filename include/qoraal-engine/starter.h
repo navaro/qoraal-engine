@@ -65,14 +65,8 @@ extern "C" {
      * Starter public interface.
      */
     int32_t     starter_init (void * arg) ;
-
-    int32_t     starter_load (const char* buffer, uint32_t length,
+    int32_t     starter_start (const char* buffer, uint32_t length,
                                 void* ctx, STARTER_OUT_FP log, bool verbose) ;
-    int32_t     starter_start (void) ;
-
-    int32_t     starter_start_ex (const char* buffer, uint32_t length,
-                                void* ctx, STARTER_OUT_FP log, bool verbose) ;
-
     int32_t     starter_stop (void) ;
 
     /*

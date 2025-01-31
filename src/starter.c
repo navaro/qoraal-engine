@@ -326,36 +326,6 @@ _starter_compile (const char* buffer, uint32_t length, void* ctx,
 
 }
 
-/**
- * @brief       Compile the input buffer and start the Engine for the loaded statemachines.
- * @note        Additional callback for debug purposes showing compiler progress and status.
- * @param[in] buffer        Engine machine language format for all the statemachines to compile.
- * @param[in] length        length of buffer.
- * @param[in] ctx           context for callback function
- * @param[in] log           callback function
- * @param[in] verbose
- * @return      status
- */
-int32_t
-starter_load (const char* buffer, uint32_t length,
-        void* ctx, STARTER_OUT_FP log, bool verbose)
-{
-    int32_t result = _starter_compile(buffer, length, ctx, log, verbose) ;
-    return result ;
-}
-
-/**
- * @brief       Compile the input buffer and start the Engine for the loaded statemachines.
- * @param[in] buffer        Engine machine language format for all the statemachines to compile.
- * @param[in] length        length of buffer.
- * @return      status
- */
-int32_t
-starter_start (void)
-{
-    int32_t result = engine_start () ;
-    return result ;
-}
 
 /**
  * @brief       Compile the input buffer and start the Engine for the loaded statemachines.
@@ -368,7 +338,7 @@ starter_start (void)
  * @return      status
  */
 int32_t
-starter_start_ex (const char* buffer, uint32_t length,
+starter_start (const char* buffer, uint32_t length,
         void* ctx, STARTER_OUT_FP log, bool verbose)
 {
     int32_t result = _starter_compile(buffer, length, ctx, log, verbose) ;
