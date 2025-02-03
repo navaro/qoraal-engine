@@ -80,6 +80,7 @@ static int32_t      action_e_lt (PENGINE_T instance, uint32_t parm, uint32_t fla
 static int32_t      action_e_gt (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_r_load (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_r_inc (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
+static int32_t      action_r_dec (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_r_set (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_r_clear (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_r_eq (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
@@ -136,7 +137,8 @@ ENGINE_ACTION_IMPL  (   e_eq,                       "return [e] == parm") ;
 ENGINE_ACTION_IMPL  (   e_gt,                       "return [e] > parm") ;
 ENGINE_ACTION_IMPL  (   e_lt,                       "return [e] < parm") ;
 ENGINE_ACTION_IMPL  (   r_load,                     "[r] = parm ; return [r]") ;
-ENGINE_ACTION_IMPL  (   r_inc,                      "if ++[r] == parm { [a] = 1; } return [r]") ;
+ENGINE_ACTION_IMPL  (   r_inc,                      "if ++[r] == parm { [a] = 1; } else { [a] = 0; } return [a]") ;
+ENGINE_ACTION_IMPL  (   r_dec,                      "if --[r] == parm { [a] = 1; } else { [a] = 0; } return [a]") ;
 ENGINE_ACTION_IMPL  (   r_set,                      "[r] = 1 ; retutn [r]") ;
 ENGINE_ACTION_IMPL  (   r_clear,                    "[r] = 0 ; retutn [r]") ;
 ENGINE_ACTION_IMPL  (   r_eq,                       "[a] = [r] == parm ; retutn [a]") ;
@@ -1329,7 +1331,40 @@ action_r_inc (PENGINE_T instance, uint32_t parm, uint32_t flags)
     reg++ ;
     if (reg >= value) {
         engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 1) ;
-        reg = value ;
+        reg = 1 ;
+    } else {
+        engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 0) ;
+        reg = 0 ;
+    }
+    engine_set_variable (instance, ENGINE_VARIABLE_REGISTER, reg) ;
+
+    return reg ;
+}
+
+/**
+ * @brief   [r]++ ; return [r]
+ * @param[in] instance      engine instance.
+ * @param[in] parm          parameter.
+ * @param[in] flags         validate and parameter type flag.
+ */
+int32_t
+action_r_dec (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    int32_t value ;
+    if (flags & (PART_ACTION_FLAG_VALIDATE)) {
+        return parts_valadate_int (instance, parm, flags, INT_MIN, INT_MAX) ;
+    }
+    value = parts_get_int (instance, parm, flags, INT_MIN, INT_MAX) ;
+
+    int32_t reg  = 0 ;
+    engine_get_variable (instance, ENGINE_VARIABLE_REGISTER, &reg) ;
+    reg-- ;
+    if (reg <= value) {
+        engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 1) ;
+        reg = 1 ;
+    } else {
+        engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 0) ;
+        reg = 0 ;
     }
     engine_set_variable (instance, ENGINE_VARIABLE_REGISTER, reg) ;
 
