@@ -6,13 +6,14 @@
 #include "qoraal-engine/config.h"
 #include "qoraal-engine/engine.h"
 #include "qoraal-engine/starter.h"
+#include "qoraal-engine/parts/parts.h"
 
 
-SVC_SHELL_CMD_DECL("engine_list", qshell_cmd_engine_list, "")
-SVC_SHELL_CMD_DECL(  "engine", qshell_cmd_engine, "[statemachine] [statemachine] [..]" )
-SVC_SHELL_CMD_DECL(  "engine_event", qshell_cmd_engine_event, " <event>" )
-SVC_SHELL_CMD_DECL(  "engine_trans", qshell_cmd_engine_trans, "[statemachine] [statemachine] [..]" )
-SVC_SHELL_CMD_DECL(  "engine_dbg", qshell_cmd_engine_dbg, "" )
+SVC_SHELL_CMD_DECL("engine_list", qshell_cmd_engine_list, "");
+SVC_SHELL_CMD_DECL(  "engine", qshell_cmd_engine, "[statemachine] [statemachine] [..]" );
+SVC_SHELL_CMD_DECL(  "engine_event", qshell_cmd_engine_event, " <event>" );
+SVC_SHELL_CMD_DECL(  "engine_trans", qshell_cmd_engine_trans, "[statemachine] [statemachine] [..]" );
+SVC_SHELL_CMD_DECL(  "engine_dbg", qshell_cmd_engine_dbg, "" );
 
 static void
 starter_list(void* ctx, starter_list_t type, const char * name, const char* description)
@@ -55,8 +56,8 @@ int32_t _engine (SVC_SHELL_IF_T * pif, char** argv, int argc, uint32_t filter)
 	int found = 0 ;
 
     if (argc < 2) {
-    	engine_loginstance (0xFFFFFFFF, 0) ;
-    	engine_logfilter (ENGINE_LOG_FILTER_DEFAULT, 0xFFFFFFFF) ;
+    	engine_loginstance ((uint32_t)-1, 0) ;
+    	engine_logfilter (ENGINE_LOG_FILTER_DEFAULT, (uint16_t)-1) ;
 
 		for (idx=0; idx<engine_statemachine_count(); idx++) {
 
@@ -74,8 +75,8 @@ int32_t _engine (SVC_SHELL_IF_T * pif, char** argv, int argc, uint32_t filter)
     } else {
 
    if (engine_logfilter(0,0) == ENGINE_LOG_FILTER_DEFAULT) {
-			engine_logfilter (0, 0xFFFFFFFF) ;
-			engine_loginstance (0, 0xFFFFFFFF) ;
+			engine_logfilter (0, (uint16_t)-1) ;
+			engine_loginstance (0, (uint32_t)-1) ;
 
 
 	}

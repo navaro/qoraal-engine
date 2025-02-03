@@ -9,6 +9,7 @@ set(ENGINE_SRC
     tool/collection.c
     tool/parse.c
     port/engine_qoraal.c
+    qshell/enginecmd.c
     engine.c
     starter.c
 )
