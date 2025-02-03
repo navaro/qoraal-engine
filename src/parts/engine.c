@@ -1331,14 +1331,14 @@ action_r_inc (PENGINE_T instance, uint32_t parm, uint32_t flags)
     reg++ ;
     if (reg >= value) {
         engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 1) ;
-        reg = 1 ;
+        value = 1 ;
     } else {
         engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 0) ;
-        reg = 0 ;
+        value = 0 ;
     }
     engine_set_variable (instance, ENGINE_VARIABLE_REGISTER, reg) ;
 
-    return reg ;
+    return value ;
 }
 
 /**
@@ -1361,14 +1361,14 @@ action_r_dec (PENGINE_T instance, uint32_t parm, uint32_t flags)
     reg-- ;
     if (reg <= value) {
         engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 1) ;
-        reg = 1 ;
+        value = 1 ;
     } else {
         engine_set_variable (instance, ENGINE_VARIABLE_ACCUMULATOR, 0) ;
-        reg = 0 ;
+        value = 0 ;
     }
     engine_set_variable (instance, ENGINE_VARIABLE_REGISTER, reg) ;
 
-    return reg ;
+    return value ;
 }
 
 
