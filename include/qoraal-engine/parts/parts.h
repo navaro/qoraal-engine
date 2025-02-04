@@ -89,6 +89,7 @@ typedef struct __attribute__((packed)) PART_CMD_S {
 
 
 #define ENGINE_ACTION_IMPL(name, desc)      \
+    static int32_t action_##name (PENGINE_T, uint32_t, uint32_t) ; \
     const PART_ACTION_T                     \
     __engine_action_##name ALIGN            \
         __attribute__((used, section(".engine.engine_action." #name ), aligned(1))) =        \
@@ -117,6 +118,7 @@ typedef struct __attribute__((packed)) PART_CMD_S {
     }
 
 #define ENGINE_CMD_FP_IMPL(fp)              \
+    static int32_t fp (PENGINE_T, uint32_t) ; \
     const PART_CMD_T                        \
     __engine_cmd_##fp ALIGN                 \
     __attribute__((used, section(".engine.engine_cmd." #fp), aligned(1))) =      \

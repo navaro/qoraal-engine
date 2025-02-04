@@ -108,7 +108,7 @@
  * Default: 8
  */
 #ifndef STATEMACHINE_SUPER_STATE_MAX
-#define STATEMACHINE_SUPER_STATE_MAX        8
+#define STATEMACHINE_SUPER_STATE_MAX        12
 #endif
 
 /**
@@ -126,7 +126,7 @@
  * Default: 8
  */
 #ifndef ENGINE_PREVIOUS_STACK
-#define ENGINE_PREVIOUS_STACK               8
+#define ENGINE_PREVIOUS_STACK               12
 #endif
 
 /**
@@ -135,7 +135,7 @@
  * Default: 4
  */
 #ifndef ENGINE_ACCUMULATOR_STACK
-#define ENGINE_ACCUMULATOR_STACK            4
+#define ENGINE_ACCUMULATOR_STACK            8
 #endif
 
 
