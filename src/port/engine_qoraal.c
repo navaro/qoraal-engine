@@ -429,22 +429,29 @@ parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t off
     char buffer[SERVICES_STRSUB_BUFFER_LEN] ;
 
     uint32_t idx = 0 ;
+    int type ;
     if (len) {
         if (isdigit((int)str[0])) {
             if (sscanf(str, "%u", (unsigned int*)&idx) <= 0) return res ;
 
         } else {
-            if (!ParseGetIdentifierId(str, len, &idx)){
-                return ENGINE_FAIL ;
-
-            }
+            type = ParseGetIdentifierId(str, len, &idx) ;
 
         }
 
     }
 
-    res = snprintf (buffer, SERVICES_STRSUB_BUFFER_LEN, "[%u]", (unsigned int)idx) ;
-    res = cb (buffer, res, offset, arg) ;
+    if (type == parseVariable) {
+        res = snprintf (buffer, SERVICES_STRSUB_BUFFER_LEN, "[%u]", (unsigned int)idx) ;
+
+    } else if (type == parseEvent) {
+        res = snprintf (buffer, SERVICES_STRSUB_BUFFER_LEN, "%u", (unsigned int)idx) ;
+       
+    }
+    if (res >= 0) {
+        res = cb (buffer, res, offset, arg) ;
+
+    }
 
     return res ;
 }

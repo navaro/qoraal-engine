@@ -589,6 +589,7 @@ engine_start (void)
 
     engine_port_lock () ;
 
+    status = parts_cmd (0, PART_CMD_PARM_START) ;
     for (i=0; i<_engine_instance_count; i++) {
         PENGINE_T engine = &_engine_instance[i] ;
         status = parts_cmd (engine, PART_CMD_PARM_START) ;
@@ -599,7 +600,6 @@ engine_start (void)
         }
 
     }
-    status = parts_cmd (0, PART_CMD_PARM_START) ;
 
     if (status != ENGINE_OK) {
         parts_cmd (0, PART_CMD_PARM_STOP) ;
@@ -669,7 +669,6 @@ engine_stop (void)
 
         ENGINE_LOG(0, ENGINE_LOG_TYPE_DEBUG, "[dbg] engine_stop") ;
 
-        parts_cmd (0, PART_CMD_PARM_STOP) ;
 
         for (i=0; i<cnt; i++) {
             PENGINE_T engine = &_engine_instance[i] ;
@@ -688,6 +687,8 @@ engine_stop (void)
             }
 
         }
+
+        parts_cmd (0, PART_CMD_PARM_STOP) ;
 
         engine_port_stop () ;
 

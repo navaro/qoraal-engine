@@ -62,16 +62,7 @@ enum parserState {
     parseStatemachineDeclare,
 };
 
-enum parseType {
-    parseEvent = 0x1,
-    parseVariable,
-    parseState ,
-    parseStateMachine ,
-    parseAction,
-    parseConst ,
-    parseRegId ,
-    parseStringId ,
-};
+
 
 struct ReservedWord
 {
@@ -1748,18 +1739,20 @@ int ParserAddEvent (const char* Name, uint32_t Id)
     return parse_install_identifier(_parser_declared, Name, 0, parseEvent, Id, &Value) ;
 }
 
-int
+enum parseType
 ParseGetIdentifierId (const char * name, uint32_t len, uint32_t * Id)
 {
     struct Value Value ;
+    enum parseType type ;
     *Id = 0 ;
     if (len == 0) len = strlen (name) ;
     if (parse_get_identifier(name, len, &Value)) {
         *Id = PARSER_ID_VALUE(Value.Id) ;
-        return 1 ;
+        type = PARSER_ID_TYPE(Value.Id) ;
+        return type ;
     }
 
-    return 0 ;
+    return parseInvalid ;
 }
 
 int ParseAnalyse(const char *Source, int SourceLen, PARSE_CB_IF * pif, PARSE_LOG_IF * logif)

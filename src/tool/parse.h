@@ -41,7 +41,17 @@
 #define PARSE_PIN_TOKEN         TokenArithmeticExor
 #define PARSE_TERMINATE_TOKEN   TokenUnaryNot
 
-
+enum parseType {
+    parseInvalid = 0x0,
+    parseEvent = 0x1,
+    parseVariable,
+    parseState ,
+    parseStateMachine ,
+    parseAction,
+    parseConst ,
+    parseRegId ,
+    parseStringId ,
+};
 
 typedef struct PARSE_CB_IF_S {
 
@@ -69,7 +79,7 @@ extern "C" {
     extern int      ParserAddAction (const char* Name, uint32_t Id) ;
     extern int      ParserAddConst (const char* Name, uint32_t Id) ;
     extern int      ParserAddEvent (const char* Name, uint32_t Id) ;
-    extern int      ParseGetIdentifierId (const char * name, uint32_t len, uint32_t * Id) ;
+    extern enum parseType      ParseGetIdentifierId (const char * name, uint32_t len, uint32_t * Id) ;
     extern int      ParseAnalyse (const char *Source, int SourceLen, PARSE_CB_IF * pif, PARSE_LOG_IF* lif) ;
     extern int      ParseComplete (PARSE_CB_IF * pif, PARSE_LOG_IF* logif) ;
 
