@@ -87,6 +87,7 @@ static const STRINGTABLE_T *        _engine_stringtable = 0 ;
 static ENGINE_T                     _engine_instance[ENGINE_MAX_INSTANCES] ;
 static ENGINE_T *                   _engine_active_instance = 0 ;
 static uint32_t                     _engine_instance_count = 0 ;
+static bool                         _engine_started = false ;
 
 /*===========================================================================*/
 /* Local declarations.                                                       */
@@ -571,11 +572,20 @@ int32_t
 engine_start (void)
 {
     uint32_t i ;
-    uint32_t status = ENGINE_OK ;
+    uint32_t status ;
 
     ENGINE_LOG(0, ENGINE_LOG_TYPE_INIT, "[ini] engine_start") ;
 
-    engine_port_start () ;
+    if (_engine_started) return E_UNEXP ;
+
+    status = engine_port_start () ;
+    if (status != EOK) {
+        return status ;
+    }
+
+    engine_port_lock () ;
+
+    _engine_started = true ;
 
     for (i=0; i<ENGINE_MAX_INSTANCES; i++) {
         PENGINE_T engine = &_engine_instance[i] ;
@@ -587,7 +597,6 @@ engine_start (void)
 
     }
 
-    engine_port_lock () ;
 
     status = parts_cmd (0, PART_CMD_PARM_START) ;
     for (i=0; i<_engine_instance_count; i++) {
@@ -662,7 +671,12 @@ engine_stop (void)
     ENGINE_DEFERED_T* start ;
     uint32_t i ;
 
+    if (!_engine_started) return E_UNEXP ;
+
     engine_port_lock () ;
+
+    _engine_started = false ;
+
     if (_engine_instance_count) {
         uint32_t cnt =  _engine_instance_count ;
         _engine_instance_count = 0 ;
@@ -690,13 +704,13 @@ engine_stop (void)
 
         parts_cmd (0, PART_CMD_PARM_STOP) ;
 
-        engine_port_stop () ;
-
         res = ENGINE_OK ;
 
     }
 
     engine_port_unlock () ;
+
+    engine_port_stop () ;
 
     return res ;
 }
