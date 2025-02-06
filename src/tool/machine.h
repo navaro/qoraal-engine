@@ -35,8 +35,8 @@
 /*===========================================================================*/
 /* Macros and defines.                                                                */
 /*===========================================================================*/
-#define ALIGN_TYPE          uintptr_t
-#define ALIGNED_SIZE(x)     ((((x + (sizeof(ALIGN_TYPE)))-((ALIGN_TYPE) 1))/(sizeof(ALIGN_TYPE))) * (sizeof(ALIGN_TYPE)))
+#define MACHINE_ALIGN_TYPE			uint32_t
+#define MACHINE_ALIGNED_SIZE(x)   	((((x + (sizeof(MACHINE_ALIGN_TYPE)))-((MACHINE_ALIGN_TYPE) 1))/(sizeof(MACHINE_ALIGN_TYPE))) * (sizeof(MACHINE_ALIGN_TYPE)))
 
 
 /*===========================================================================*/

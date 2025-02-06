@@ -264,7 +264,7 @@ machine_stringtable_create(struct collection * dict)
     for (p = collection_it_first (dict, &it) ; p;  ) {
         count++ ;
         const char * key = collection_get_key (dict, p) ;
-        total_len += ALIGNED_SIZE(sizeof (STATEMACHINE_STRING_T) + strlen(key) + 1) ;
+        total_len += MACHINE_ALIGNED_SIZE(sizeof (STATEMACHINE_STRING_T) + strlen(key) + 1) ;
         p = collection_it_next (dict, &it) ;
 
     }
@@ -297,7 +297,7 @@ machine_stringtable_create(struct collection * dict)
                 pstring->id = ((unsigned int*)collection_get_value (dict, p))[1] ;
 
                 pstring = (STATEMACHINE_STRING_T*)  ((uintptr_t)pstring +
-                        ALIGNED_SIZE(sizeof (STATEMACHINE_STRING_T) + (pstring->len))) ;
+                        MACHINE_ALIGNED_SIZE(sizeof (STATEMACHINE_STRING_T) + (pstring->len))) ;
 
                 break ;
 
@@ -340,7 +340,7 @@ machine_state_validate(const STATEMACHINE_T* statemachine,
             "(none)" : (char*)GET_STATEMACHINE_STATE_REF(statemachine, state->super_idx)->name)) ;
 
     if (state->def_idx != STATEMACHINE_INVALID_STATE) {
-        int i = STATEMACHINE_SUPER_STATE_MAX ;
+        i = STATEMACHINE_SUPER_STATE_MAX ;
         STATEMACHINE_STATE_T* defstate = GET_STATEMACHINE_STATE_REF(statemachine, state->def_idx) ;
         while (defstate && (defstate->def_idx != STATEMACHINE_INVALID_STATE) && --i) {
             if (state->idx == defstate->idx) {
@@ -360,7 +360,7 @@ machine_state_validate(const STATEMACHINE_T* statemachine,
         }
     }
     if (state->super_idx != STATEMACHINE_INVALID_STATE) {
-        int i = STATEMACHINE_SUPER_STATE_MAX ;
+        i = STATEMACHINE_SUPER_STATE_MAX ;
         STATEMACHINE_STATE_T* superstate = GET_STATEMACHINE_STATE_REF(statemachine, state->super_idx) ;
         while (superstate && (superstate->super_idx != STATEMACHINE_INVALID_STATE) && --i) {
             if (state->idx == superstate->idx) {
@@ -641,7 +641,7 @@ machine_stringtable_validate(const STRINGTABLE_T* strings, PARSE_LOG_IF * logif)
 
     for (i=0; i<strings->count; i++) {
         const STATEMACHINE_STRING_T *str = GET_STATEMACHINE_STRINGTABLE_REF(strings, i) ;
-        total_length += ALIGNED_SIZE(str->len + sizeof(STATEMACHINE_STRING_T)) ;
+        total_length += MACHINE_ALIGNED_SIZE(str->len + sizeof(STATEMACHINE_STRING_T)) ;
 
     }
 
