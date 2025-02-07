@@ -18,10 +18,10 @@
 */
 // #define CFG_ENGINE_ENGINE_PART_DISABLE    1
 
-/* CFG_ENGINE_REGISTRY_DISABLE
-    If defined, the registry will be disabled.
+/* CFG_ENGINE_REGISTRY_ENABLE
+    If defined, the registry will be enabled.
 */
-// #define CFG_ENGINE_REGISTRY_DISABLE    1
+// #define CFG_ENGINE_REGISTRY_ENABLE    1
 
 
 /* CFG_ENGINE_STRSUB_DISABLE

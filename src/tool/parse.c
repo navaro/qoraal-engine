@@ -34,7 +34,7 @@
 #include "collection.h"
 #include "lex.h"
 #include "machine.h"
-#if !defined CFG_ENGINE_REGISTRY_DISABLE
+#if defined CFG_ENGINE_REGISTRY_ENABLE
 #include "qoraal-flash/registry.h"
 #endif
 #include "qoraal-engine/engine.h"
@@ -810,7 +810,7 @@ int ParserVariablesDeclare (struct LexState * Lexer, enum LexToken Token, struct
                 engine_port_variable_write (idx - ENGINE_REGISTER_COUNT, intval) ;
 
             } 
-#if !defined CFG_ENGINE_REGISTRY_DISABLE     
+#if defined CFG_ENGINE_REGISTRY_ENABLE   
             else if (PARSER_ID_TYPE(Parm.Id) == parseRegId) {
                 if (registry_int32_get (Parm.Val.Identifier, &intval) != ENGINE_OK) {
                     PARSER_REPORT(statemachine->logif,
