@@ -429,7 +429,7 @@ parse_strsub_cb(STRSUB_REPLACE_CB cb, const char * str, size_t len, uint32_t off
     char buffer[SERVICES_STRSUB_BUFFER_LEN] ;
 
     uint32_t idx = 0 ;
-    int type ;
+    int type = parseInvalid ;
     if (len) {
         if (isdigit((int)str[0])) {
             if (sscanf(str, "%u", (unsigned int*)&idx) <= 0) return res ;

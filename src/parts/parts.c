@@ -101,7 +101,7 @@ parts_cmd (PENGINE_T instance, uint32_t cmd)
 const PART_ACTION_T*
 parts_get_action (uint16_t action_id)
 {
-    PART_ACTION_T* paction = (PART_ACTION_T*)&__engine_action_base__ ;
+    PART_ACTION_T* paction = (PART_ACTION_T*)(void*)&__engine_action_base__ ;
 
     return &paction[action_id & STATES_ACTION_ID_MASK] ;
 }
@@ -120,7 +120,10 @@ parts_get_action_fp (uint16_t action_id)
 
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
     return action->fp ;
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -138,7 +141,10 @@ parts_get_action_name (uint16_t action_id)
 
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
     return action->name ;
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -196,14 +202,22 @@ parts_find_event_id (const char* name)
 {
     uint32_t j ;
 
-    PART_EVENT_T* pevent = (PART_EVENT_T*)&__engine_event_base__ ;
-    for (j = 0; &pevent[j] < (PART_EVENT_T*)&__engine_event_end__ ; j++) {
+    PART_EVENT_T* pevent = (PART_EVENT_T*)(void*)&__engine_event_base__;
+    PART_EVENT_T* event_end = (PART_EVENT_T*)(void*)&__engine_event_end__;
+    size_t num_events = ((uintptr_t)event_end - (uintptr_t)pevent) / sizeof(PART_EVENT_T);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
+    for (j = 0; j < num_events ; j++) {
 
         if (strcmp(pevent[j].name, name) == 0) {
             return j ;
         }
 
     }
+
+#pragma GCC diagnostic pop
 
     return ENGINE_FAIL ;
 }
