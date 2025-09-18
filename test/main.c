@@ -22,7 +22,7 @@
 #define OPTION_ID_CONFIG_FILE       8
 #define OPTION_COMMENT_MAX          256
 
-void            logger_cb (void* channel, LOGGERT_TYPE_T type, uint8_t facility, const char* msg) ;
+void            logger_cb (void* channel, LOGGER_TYPE_T type, uint8_t facility, const char* msg) ;
 static int32_t  out(void* ctx, uint32_t out, const char* str) ;
 static void     list(void* ctx, starter_list_t type, const char * name, const char* description) ;
 
@@ -233,7 +233,7 @@ out(void* ctx, uint32_t out, const char* str)
 }
 
 void
-logger_cb (void* channel, LOGGERT_TYPE_T type, uint8_t facility, const char* msg)
+logger_cb (void* channel, LOGGER_TYPE_T type, uint8_t facility, const char* msg)
 {
     printf("--- %s\n", msg) ;
 }
