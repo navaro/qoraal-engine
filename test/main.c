@@ -6,8 +6,8 @@
 #include <string.h>
 #include <getopt.h>
 #include "qoraal/qoraal.h"
+#include "qoraal/platform.h"
 #include "qoraal-flash/qoraal.h"
-#include "qoraal/example/platform.h"
 #include "qoraal/svc/svc_logger.h"
 #include "qoraal-engine/starter.h"
 #include "qoraal-engine/parts/parts_events.h"
