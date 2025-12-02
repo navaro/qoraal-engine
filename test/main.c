@@ -26,7 +26,7 @@ void            logger_cb (void* channel, LOGGER_TYPE_T type, uint8_t facility, 
 static int32_t  out(void* ctx, uint32_t out, const char* str) ;
 static void     list(void* ctx, starter_list_t type, const char * name, const char* description) ;
 
-static const QORAAL_CFG_T       _qoraal_cfg = { .malloc = platform_malloc, .free = platform_free, .debug_print = platform_print, .debug_assert = platform_assert, .current_time = platform_current_time, .rand = platform_rand, .wdt_kick = platform_wdt_kick};
+static const QORAAL_CFG_T       _qoraal_cfg = { .malloc = platform_malloc, .free = platform_free, .debug_print = platform_print, .debug_getch = platform_getch, .debug_assert = platform_assert, .current_time = platform_current_time, .rand = platform_rand, .wdt_kick = platform_wdt_kick};
 static const QORAAL_FLASH_CFG_T _qoraal_flash_cfg = { .flash_read = platform_flash_read, .flash_write = platform_flash_write, .flash_erase = platform_flash_erase};
 static LOGGER_CHANNEL_T         _qoraal_log_channel = { .fp = logger_cb, .user = (void*)0, .filter = { { .mask = SVC_LOGGER_MASK, .type = SVC_LOGGER_SEVERITY_LOG | SVC_LOGGER_FLAGS_PROGRESS }, {0,0} } };
 

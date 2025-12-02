@@ -62,7 +62,7 @@ int32_t
 platform_stop ()
 {
     platform_free (QORAAL_HeapAuxiliary, _platform_flash) ;
-#if 0 //defined _WIN32 && defined CFG_OS_POSIX
+#if 0 // defined _WIN32 && defined CFG_OS_POSIX
      WSACleanup();
 #endif
     return 0 ;
@@ -84,7 +84,74 @@ void
 platform_print (const char *format)
 {
     printf ("%s", format) ;
+    fflush(stdout);
 }
+
+#ifdef _WIN32
+
+#include <conio.h>
+#include <ctype.h>
+
+int32_t
+platform_getch(uint32_t timeout_ms)
+{
+    int c = _getch();
+
+    /* Normalize Enter */
+    if (c == '\r')
+        c = '\n';
+
+    /* Local echo */
+    if (c == '\n') {
+        putchar('\n');
+    } else if (c == 8 || c == 127) {
+        /* Backspace: delete previous char visually */
+        fputs("\b \b", stdout);
+    } else if (isprint(c)) {
+        putchar(c);
+    }
+    fflush(stdout);
+
+    return c;
+}
+#else
+#include <termios.h>
+#include <unistd.h>
+#include <ctype.h>
+
+int32_t
+platform_getch(uint32_t timeout_ms)
+{
+    struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);  /* raw-ish, no echo */
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    int c = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+    /* Normalize Enter */
+    if (c == '\r')
+        c = '\n';
+
+    /* Local echo */
+    if (c == '\n') {
+        putchar('\n');
+    } else if (c == 8 || c == 127) {
+        fputs("\b \b", stdout);
+    } else if (isprint(c)) {
+        putchar(c);
+    }
+    fflush(stdout);
+
+    return c;
+}
+
+#endif
+
 
 void
 platform_assert (const char *format)
@@ -156,6 +223,7 @@ platform_flash_read (uint32_t addr, uint32_t len, uint8_t * data)
 #include <stdlib.h>
 
 extern size_t console_write(const uint8_t *data, size_t len, uint32_t timeout_ms) ;
+extern int32_t console_get_char(uint32_t timeout_ms) ;
 
 static uint32_t _platform_flash_size;
 
@@ -198,6 +266,12 @@ platform_print(const char *format)
 {
     console_write (format, strlen(format), 1000) ;
    // printk("%s", format);
+}
+
+int32_t 
+platform_getch (uint32_t timeout_ms)
+{
+    return console_get_char(timeout_ms);
 }
 
 void
