@@ -56,7 +56,18 @@ action_nop (PENGINE_T instance, uint32_t parm, uint32_t flags)
     return ENGINE_OK ;
 }
 
-
+void parts_init (void)
+{
+#if !defined CFG_ENGINE_CONSOLE_PART_DISABLE
+    void part_console_force_link(void) ;
+#endif
+#if !defined CFG_ENGINE_DEBUG_PART_DISABLE
+    void part_debug_force_link(void) ;
+#endif
+#if !defined CFG_ENGINE_ENGINE_PART_DISABLE
+    void part_engine_force_link(void) ;
+#endif   
+}
 
 
 /**

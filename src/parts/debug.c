@@ -198,4 +198,12 @@ action_debug_dump (PENGINE_T instance, uint32_t parm, uint32_t flags)
     return ENGINE_OK ;
 }
 
+/* This function exists only to force this module into any final binary
+ * that wants shell commands. It does nothing at runtime.
+ */
+void part_debug_force_link(void)
+{
+    /* intentionally empty */
+}
+
 #endif /* CFG_ENGINE_DEBUG_PART_DISABLE */

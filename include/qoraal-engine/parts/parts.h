@@ -137,6 +137,7 @@ extern "C" {
     /*
      * Functions used by engine to access parts.
      */
+    extern void                 parts_init (void) ;
     extern int32_t              parts_cmd (PENGINE_T instance, uint32_t cmd) ;
     extern const PART_ACTION_T* parts_get_action (uint16_t action_id) ;
     extern const PART_EVENT_T*  parts_get_event (uint16_t event_id) ;

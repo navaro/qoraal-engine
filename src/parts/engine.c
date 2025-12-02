@@ -1525,6 +1525,15 @@ action_p_add (PENGINE_T instance, uint32_t parm, uint32_t flags)
     return value ;
 }
 
+
+/* This function exists only to force this module into any final binary
+ * that wants shell commands. It does nothing at runtime.
+ */
+void part_engine_force_link(void)
+{
+    /* intentionally empty */
+}
+
 #endif /* CFG_ENGINE_ENGINE_PART_DISABLE */
 
     /**@}*/

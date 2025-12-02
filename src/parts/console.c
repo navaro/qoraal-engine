@@ -184,5 +184,12 @@ engine_console_event (uint16_t event, uint32_t ch)
 }
 
 
+/* This function exists only to force this module into any final binary
+ * that wants shell commands. It does nothing at runtime.
+ */
+void part_console_force_link(void)
+{
+    /* intentionally empty */
+}
 
 #endif /* CFG_ENGINE_CONSOLE_PART_DISABLE */

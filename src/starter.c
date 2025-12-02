@@ -131,6 +131,9 @@ starter_parser_init (void)
 {
     uint32_t j ;
 
+    parts_init () ;
+
+
      PART_ACTION_T* paction = (PART_ACTION_T*)&__engine_action_base__ ;
      for (j = 0; paction < (PART_ACTION_T*)&__engine_action_end__ ; j++) {
 
