@@ -20,3 +20,5 @@ add_library(qoraal-engine STATIC ${ENGINE_SRC})
 # Link necessary libraries
 target_link_libraries(qoraal-engine qoraal)
 
+# Set target include dirs
+target_include_directories(qoraal-engine PUBLIC ${PROJECT_SOURCE_DIR}/include)
