@@ -37,7 +37,7 @@ include_directories(include)
 add_subdirectory(src)
 
 # Option to build tests
-option(BUILD_TESTS "Build the test directory" OFF)
-if(BUILD_TESTS)
+option(BUILD_ENGINE_TESTS "Build the test directory" OFF)
+if(BUILD_ENGINE_TESTS)
     add_subdirectory(test)
 endif()

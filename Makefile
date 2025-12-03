@@ -1,7 +1,7 @@
 ifeq ($(OS),Windows_NT)
-	CMAKE = cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_TESTS=ON -G "MinGW Makefiles"
+	CMAKE = cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_ENGINE_TESTS=ON -G "MinGW Makefiles"
 else
-	CMAKE = cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_TESTS=ON
+	CMAKE = cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_ENGINE_TESTS=ON
 endif
 MKDIR = mkdir -p build
 EXECUTABLE = ./build/test/toaster ./test/toaster.e

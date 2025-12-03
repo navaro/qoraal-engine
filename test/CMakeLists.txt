@@ -6,11 +6,15 @@ set(TEST_SRCS
 
 add_executable(toaster ${TEST_SRCS})
 target_compile_definitions(qoraal PRIVATE CFG_OS_POSIX)
+if(CFG_ENGINE_REGISTRY_ENABLE)
 target_compile_definitions(qoraal-flash PRIVATE CFG_OS_POSIX)
+endif()
 target_compile_definitions(toaster PRIVATE CFG_OS_POSIX)
 target_compile_options(qoraal PRIVATE -O0 -g)
 target_compile_options(qoraal-engine PRIVATE -O0 -g)
+if(CFG_ENGINE_REGISTRY_ENABLE)
 target_compile_options(qoraal-flash PRIVATE -O0 -g)
+endif()
 target_compile_options(toaster PRIVATE -O0 -g)
 
 # If you want debugging turned off, change -O0 -g or remove them
