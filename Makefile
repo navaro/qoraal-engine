@@ -1,3 +1,8 @@
+ifeq ($(OS),Windows_NT)
+	CMAKE = cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_TESTS=ON -G "MinGW Makefiles"
+else
+	CMAKE = cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_TESTS=ON
+endif
 MKDIR = mkdir -p build
 EXECUTABLE = ./build/test/toaster ./test/toaster.e
 RM = rm -rf
@@ -8,7 +13,7 @@ all: build run
 
 build:
 	$(MKDIR)
-	cd build && cmake .. -DCFG_ENGINE_REGISTRY_ENABLE=ON -DBUILD_TOASTER=ON && cmake --build .
+	cd build && $(CMAKE) && cmake --build .
 
 run:
 	cd $(CURDIR) && $(EXECUTABLE)
