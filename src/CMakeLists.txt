@@ -15,7 +15,7 @@ set(ENGINE_SRC
 )
 
 # Add the library target
-add_library(qoraal-engine STATIC ${ENGINE_SRC})
+add_library(qoraal-engine OBJECT ${ENGINE_SRC})
 
 # Link necessary libraries
 target_link_libraries(qoraal-engine qoraal)
