@@ -20,11 +20,6 @@ target_compile_options(toaster PRIVATE -O0 -g)
 # If you want debugging turned off, change -O0 -g or remove them
 target_link_libraries(toaster PRIVATE qoraal qoraal-flash qoraal-engine pthread)
 
-target_link_options(toaster PRIVATE
-    "-Wl,--whole-archive"
-    "$<TARGET_FILE:qoraal-engine>"
-    "-Wl,--no-whole-archive"
-)
 
 # Generate a map file
 set_target_properties(toaster PROPERTIES LINK_FLAGS "-Wl,-Map=output.map -T ${CMAKE_SOURCE_DIR}/test/posix.ld")
